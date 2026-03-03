@@ -1,0 +1,127 @@
+@import '../styles/shared.css';
+
+.team-page {
+  padding-top: var(--navbar-height);
+}
+
+.team-hero {
+  height: 40vh;
+  min-height: 300px;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+              url('/images/team-hero.jpg') center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--background-light);
+  margin-bottom: var(--spacing-xl);
+}
+
+.team-hero-content {
+  max-width: 800px;
+  padding: 0 var(--spacing-md);
+}
+
+.team-hero-content h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 3rem;
+  margin-bottom: var(--spacing-sm);
+  font-weight: 600;
+}
+
+.team-hero-content p {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.team-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md) var(--spacing-xl);
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.team-card {
+  background: var(--background-light);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.team-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+.team-card-image {
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+}
+
+.team-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.team-card:hover .team-card-image img {
+  transform: scale(1.05);
+}
+
+.team-card-content {
+  padding: var(--spacing-md);
+}
+
+.team-card-content h3 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.5rem;
+  color: var(--text-dark);
+  margin-bottom: var(--spacing-xs);
+}
+
+.team-card-content .position {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1rem;
+  color: #d4af37;
+  margin-bottom: var(--spacing-sm);
+  font-weight: 500;
+}
+
+.team-card-content .bio {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .team-hero {
+    height: 30vh;
+    min-height: 200px;
+  }
+
+  .team-hero-content h1 {
+    font-size: 2.5rem;
+  }
+
+  .team-hero-content p {
+    font-size: 1rem;
+  }
+
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .team-card-image {
+    height: 250px;
+  }
+} 

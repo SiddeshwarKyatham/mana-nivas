@@ -1,0 +1,11 @@
+{
+  "name": "mana-nivas",
+  "version": "1.0.0",
+  "description": "Mana Nivas Hotel Booking Application",
+  "scripts": {
+    "dev": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "preview": "cd client && npm run preview",
+    "install-all": "npm install && cd client && npm install"
+  }
+}

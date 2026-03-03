@@ -1,0 +1,131 @@
+@import '../styles/shared.css';
+
+.faq-page {
+  padding-top: var(--navbar-height);
+}
+
+.faq-hero {
+  height: 60vh;
+  min-height: 400px;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+              url('/images/faq-hero.jpg') center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--background-light);
+  margin-bottom: var(--spacing-xl);
+}
+
+.faq-hero-content {
+  max-width: 800px;
+  padding: 0 var(--spacing-md);
+}
+
+.faq-hero-content h1 {
+  font-family: var(--font-primary);
+  font-size: 3.5rem;
+  margin-bottom: var(--spacing-sm);
+  font-weight: 600;
+}
+
+.faq-hero-content p {
+  font-family: var(--font-secondary);
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.faq-content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md) var(--spacing-xl);
+}
+
+.faq-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.faq-item {
+  background: var(--background-light);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.faq-question {
+  padding: var(--spacing-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background: var(--background-light);
+}
+
+.faq-question h3 {
+  font-family: var(--font-secondary);
+  font-size: 1.1rem;
+  color: var(--text-dark);
+  margin: 0;
+  flex: 1;
+  text-align: left;
+}
+
+.faq-icon {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  transition: transform 0.3s ease;
+}
+
+.faq-item.open .faq-icon {
+  transform: rotate(45deg);
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  background: var(--background-gray);
+}
+
+.faq-item.open .faq-answer {
+  max-height: 500px;
+  padding: var(--spacing-md);
+}
+
+.faq-answer p {
+  font-family: var(--font-secondary);
+  font-size: 1rem;
+  color: var(--text-light);
+  line-height: 1.6;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .faq-hero {
+    height: 50vh;
+    min-height: 300px;
+  }
+
+  .faq-hero-content h1 {
+    font-size: 2.5rem;
+  }
+
+  .faq-hero-content p {
+    font-size: 1rem;
+  }
+
+  .faq-content {
+    padding: 0 var(--spacing-sm) var(--spacing-lg);
+  }
+
+  .faq-question h3 {
+    font-size: 1rem;
+  }
+} 

@@ -1,0 +1,210 @@
+/* Unified Hero Section Styles - Based on Contact Page Design */
+
+/* Base Hero Section Structure */
+.unified-hero {
+  position: relative;
+  height: 80vh;
+  min-height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 60px;
+  overflow: hidden;
+}
+
+/* Hero Overlay - Consistent across all pages */
+.unified-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6));
+  z-index: 1;
+}
+
+/* Hero Image Container */
+.unified-hero-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Hero Image Styling */
+.unified-hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.8);
+  transform: scale(1.1);
+  transition: transform 0.5s ease;
+}
+
+/* Hero Image Hover Effect */
+.unified-hero:hover .unified-hero-image img {
+  transform: scale(1);
+}
+
+/* Hero Content Container */
+.unified-hero-content {
+  position: relative;
+  z-index: 2;
+  width: 90%;
+  max-width: 800px;
+  color: var(--ivory);
+  animation: fadeInUp 1s ease;
+}
+
+/* Fade In Up Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hero Headline - Gradient Text Effect */
+.unified-hero-headline {
+  font-family: 'Cinzel', serif;
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(to right, var(--ivory), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+/* Hero Subheadline */
+.unified-hero-subheadline {
+  font-size: 1.5rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  color: var(--ivory);
+  font-weight: 400;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Hero CTA Button */
+.unified-hero-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem 3rem;
+  background: linear-gradient(135deg, var(--gold) 0%, #d4af37 100%);
+  color: var(--charcoal);
+  text-decoration: none;
+  border-radius: 3rem;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 8px 32px rgba(196, 155, 59, 0.3);
+  margin-top: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.unified-hero-cta::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s;
+}
+
+.unified-hero-cta:hover::before {
+  left: 100%;
+}
+
+.unified-hero-cta:hover {
+  background: linear-gradient(135deg, #d4af37 0%, var(--gold) 100%);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(196, 155, 59, 0.5);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .unified-hero {
+    height: 70vh;
+    min-height: 500px;
+  }
+  
+  .unified-hero-headline {
+    font-size: 3.5rem;
+  }
+  
+  .unified-hero-subheadline {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .unified-hero {
+    height: 60vh;
+    min-height: 400px;
+  }
+  
+  .unified-hero-headline {
+    font-size: 3rem;
+  }
+  
+  .unified-hero-subheadline {
+    font-size: 1.2rem;
+  }
+  
+  .unified-hero-cta {
+    padding: 1rem 2.5rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .unified-hero {
+    height: 50vh;
+    min-height: 300px;
+  }
+  
+  .unified-hero-headline {
+    font-size: 2.5rem;
+  }
+  
+  .unified-hero-subheadline {
+    font-size: 1.1rem;
+  }
+  
+  .unified-hero-cta {
+    padding: 0.8rem 2rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Special Home Page Hero - Full Screen */
+.home .unified-hero {
+  height: 100vh;
+  min-height: 100vh;
+  margin-bottom: 0;
+}
+
+/* Page-specific positioning */
+.contact-page .unified-hero,
+.about-page .unified-hero,
+.spa-page .unified-hero,
+.dining-page .unified-hero {
+  margin-top: 0;
+}

@@ -1,0 +1,129 @@
+@import '../styles/shared.css';
+
+.legal-page {
+  padding-top: var(--navbar-height);
+}
+
+.legal-hero {
+  height: 40vh;
+  min-height: 300px;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+              url('/images/legal-hero.jpg') center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--background-light);
+  margin-bottom: var(--spacing-xl);
+}
+
+.legal-hero-content {
+  max-width: 800px;
+  padding: 0 var(--spacing-md);
+}
+
+.legal-hero-content h1 {
+  font-family: var(--font-primary);
+  font-size: 3rem;
+  margin-bottom: var(--spacing-sm);
+  font-weight: 600;
+}
+
+.legal-hero-content p {
+  font-family: var(--font-secondary);
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.legal-content {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md) var(--spacing-xl);
+}
+
+.legal-section {
+  margin-bottom: var(--spacing-lg);
+  background: var(--background-light);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-md);
+  transition: box-shadow 0.3s ease;
+}
+
+.legal-section:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.legal-section h2 {
+  font-family: var(--font-primary);
+  font-size: 1.8rem;
+  color: var(--text-dark);
+  margin-bottom: var(--spacing-sm);
+  font-weight: 600;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: var(--spacing-xs);
+}
+
+.legal-section p {
+  font-family: var(--font-secondary);
+  font-size: 1.1rem;
+  color: var(--text-light);
+  margin-bottom: var(--spacing-sm);
+  line-height: 1.6;
+}
+
+.legal-section ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.legal-section li {
+  font-family: var(--font-secondary);
+  font-size: 1.1rem;
+  color: var(--text-light);
+  margin-bottom: var(--spacing-xs);
+  line-height: 1.6;
+  padding-left: var(--spacing-md);
+  position: relative;
+}
+
+.legal-section li::before {
+  content: "•";
+  color: var(--primary-color);
+  position: absolute;
+  left: 0;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+  .legal-hero {
+    height: 30vh;
+    min-height: 200px;
+  }
+
+  .legal-hero-content h1 {
+    font-size: 2.5rem;
+  }
+
+  .legal-hero-content p {
+    font-size: 1rem;
+  }
+
+  .legal-content {
+    padding: 0 var(--spacing-sm) var(--spacing-lg);
+  }
+
+  .legal-section {
+    padding: var(--spacing-sm);
+  }
+
+  .legal-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .legal-section p,
+  .legal-section li {
+    font-size: 1rem;
+  }
+} 
