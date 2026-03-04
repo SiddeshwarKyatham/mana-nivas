@@ -14,9 +14,9 @@ const Spa = () => {
   return (
     <div className="spa-page">
       {/* Hero Banner */}
-      <section className="spa-hero" style={{ marginTop: '80px' }}>
+      <section className="spa-hero" >
         <div className="spa-hero-image">
-          <img src={spaHero} alt="Luxury Spa Experience" />
+          <img src={spaHero} alt="Luxury Spa Experience" loading="eager" fetchPriority="high" decoding="async" />
         </div>
         <div className="spa-hero-content">
           <h1 className="spa-hero-headline">Rejuvenate Your Senses</h1>
@@ -30,32 +30,32 @@ const Spa = () => {
         <div className="spa-treatments-grid">
           <div className="treatment-card">
             <div className="treatment-image">
-              <img src={treatmentAyurvedaMassage} alt="Ayurveda Massage" />
+              <img src={treatmentAyurvedaMassage} alt="Ayurveda Massage" loading="lazy" decoding="async" />
             </div>
             <div className="treatment-info">
               <h3>Ayurveda Massage</h3>
               <p>Traditional oil massage for deep relaxation.</p>
-              <span>60 min &mdash; ₹2500</span>
+              <span>60 min - INR 2500</span>
             </div>
           </div>
           <div className="treatment-card">
             <div className="treatment-image">
-              <img src={treatmentAromaTherapy} alt="Aroma Therapy" />
+              <img src={treatmentAromaTherapy} alt="Aroma Therapy" loading="lazy" decoding="async" />
             </div>
             <div className="treatment-info">
               <h3>Aroma Therapy</h3>
               <p>Essential oils to soothe mind and body.</p>
-              <span>45 min &mdash; ₹1800</span>
+              <span>45 min - INR 1800</span>
             </div>
           </div>
           <div className="treatment-card">
             <div className="treatment-image">
-              <img src={treatmentReflexology} alt="Reflexology" />
+              <img src={treatmentReflexology} alt="Reflexology" loading="lazy" decoding="async" />
             </div>
             <div className="treatment-info">
               <h3>Reflexology</h3>
               <p>Foot therapy to restore balance and energy.</p>
-              <span>30 min &mdash; ₹1200</span>
+              <span>30 min - INR 1200</span>
             </div>
           </div>
         </div>
@@ -67,7 +67,7 @@ const Spa = () => {
         <div className="spa-ambiance-gallery">
           <div className="ambiance-card">
             <div className="ambiance-image">
-              <img src={spaRoom} alt="Traditional South Indian Spa Room" />
+              <img src={spaRoom} alt="Traditional South Indian Spa Room" loading="lazy" decoding="async" />
             </div>
             <div className="ambiance-info">
               <h3>Traditional South Indian Spa Room</h3>
@@ -76,7 +76,7 @@ const Spa = () => {
           </div>
           <div className="ambiance-card">
             <div className="ambiance-image">
-              <img src={candlelitSpa} alt="Candlelit Spa Ambience" />
+              <img src={candlelitSpa} alt="Candlelit Spa Ambience" loading="lazy" decoding="async" />
             </div>
             <div className="ambiance-info">
               <h3>Candlelit Spa Ambience</h3>
@@ -85,7 +85,7 @@ const Spa = () => {
           </div>
           <div className="ambiance-card">
             <div className="ambiance-image">
-              <img src={oilTherapy} alt="Ayurvedic Oil Therapy Setup" />
+              <img src={oilTherapy} alt="Ayurvedic Oil Therapy Setup" loading="lazy" decoding="async" />
             </div>
             <div className="ambiance-info">
               <h3>Ayurvedic Oil Therapy Setup</h3>
@@ -94,7 +94,7 @@ const Spa = () => {
           </div>
           <div className="ambiance-card">
             <div className="ambiance-image">
-              <img src={spaLounge} alt="Spa Lounge Waiting Area" />
+              <img src={spaLounge} alt="Spa Lounge Waiting Area" loading="lazy" decoding="async" />
             </div>
             <div className="ambiance-info">
               <h3>Spa Lounge Waiting Area</h3>
@@ -103,7 +103,7 @@ const Spa = () => {
           </div>
           <div className="ambiance-card">
             <div className="ambiance-image">
-              <img src={steamRoom} alt="Steam Room / Herbal Bath Scene" />
+              <img src={steamRoom} alt="Steam Room / Herbal Bath Scene" loading="lazy" decoding="async" />
             </div>
             <div className="ambiance-info">
               <h3>Steam Room / Herbal Bath Scene</h3>

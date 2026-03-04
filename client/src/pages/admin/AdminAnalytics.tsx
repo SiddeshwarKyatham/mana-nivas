@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import { supabase } from '../../supabaseClient';
+import '../AdminDashboard.css';
 
 interface AnalyticsBooking {
   id: string;
@@ -38,10 +39,20 @@ const AdminAnalytics: React.FC = () => {
   }, [authLoading, isAuthenticated, user]);
 
   if (authLoading || loading) {
-    return <LoadingSpinner size="large" message="Loading analytics..." />;
+    return (
+      <div className="admin-dashboard-container admin-subpage">
+        <LoadingSpinner size="large" message="Loading analytics..." />
+      </div>
+    );
   }
   if (error) {
-    return <div style={{ color: 'red' }}>{error}</div>;
+    return (
+      <div className="admin-dashboard-container admin-subpage">
+        <div className="admin-table-wrapper">
+          <p className="admin-inline-error">{error}</p>
+        </div>
+      </div>
+    );
   }
 
   const totals = bookings.reduce(
@@ -57,9 +68,12 @@ const AdminAnalytics: React.FC = () => {
   const occupancyRate = totals.totalBookings > 0 ? ((totals.activeBookings / totals.totalBookings) * 100).toFixed(1) : '0.0';
 
   return (
-    <div>
-      <h1>Analytics</h1>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginTop: '1rem' }}>
+    <div className="admin-dashboard-container admin-subpage">
+      <div className="admin-analytics-header">
+        <h1>Analytics</h1>
+        <p>Live booking and revenue insights from Supabase.</p>
+      </div>
+      <div className="admin-stats">
         <div className="stat-card"><h3>Total Revenue</h3><p className="stat-number">${totals.totalRevenue.toLocaleString()}</p></div>
         <div className="stat-card"><h3>Total Bookings</h3><p className="stat-number">{totals.totalBookings}</p></div>
         <div className="stat-card"><h3>Active Bookings</h3><p className="stat-number">{totals.activeBookings}</p></div>

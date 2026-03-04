@@ -6,6 +6,11 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: 2rem;
+  animation: adminFadeIn 0.35s ease-out both;
+}
+
+.admin-subpage {
+  padding-top: 2rem;
 }
 
 .admin-header {
@@ -199,6 +204,7 @@
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(196, 155, 59, 0.1);
   margin-bottom: 2rem;
+  animation: adminLiftIn 0.45s ease-out both;
 }
 
 .admin-table-wrapper h2 {
@@ -215,6 +221,11 @@
 .admin-table {
   width: 100%;
   border-collapse: collapse;
+}
+
+.admin-table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .admin-table th {
@@ -264,6 +275,111 @@
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+.admin-inline-error {
+  color: #991b1b;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.admin-kpis {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.admin-kpi {
+  background: rgba(196, 155, 59, 0.08);
+  border: 1px solid rgba(196, 155, 59, 0.2);
+  color: var(--charcoal);
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.admin-meta {
+  font-size: 12px;
+  color: #555;
+}
+
+.admin-section-gap {
+  margin-top: 2rem;
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.status-chip.booked {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.status-chip.cancelled {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.status-chip.pending {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.admin-loading-text {
+  color: var(--text-muted);
+  margin: 0 0 1.5rem;
+}
+
+.admin-analytics-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.admin-analytics-header h1 {
+  margin: 0 0 0.45rem;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 3.6vw, 2.6rem);
+  color: var(--charcoal);
+}
+
+.admin-analytics-header p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+@keyframes adminFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes adminLiftIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 
@@ -319,6 +435,7 @@
   .admin-table td {
     padding: 0.75rem;
     font-size: 0.9rem;
+    min-width: 120px;
   }
 }
 
@@ -366,6 +483,7 @@
   .admin-table td {
     padding: 0.5rem;
     font-size: 0.8rem;
+    min-width: 110px;
   }
   
   .admin-table button {

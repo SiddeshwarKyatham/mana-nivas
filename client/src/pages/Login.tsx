@@ -25,7 +25,7 @@ const Login: React.FC = () => {
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
-        email: formData.email,
+        email: formData.email.trim().toLowerCase(),
         password: formData.password,
       });
 
@@ -52,16 +52,8 @@ const Login: React.FC = () => {
 
   return (
     <div className="auth-page">
-      {showError && errorMessage && (
-        <ErrorAlert 
-          message={errorMessage}
-          onClose={() => setShowError(false)}
-          type="error"
-        />
-      )}
-      
       <div className="auth-left">
-        <motion.div 
+        <motion.div
           className="auth-logo"
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -70,7 +62,7 @@ const Login: React.FC = () => {
           <div className="logo-sparkle"></div>
           <img src="/logo.jpg" alt="Logo" />
         </motion.div>
-        <motion.h1 
+        <motion.h1
           className="auth-brand"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -78,7 +70,7 @@ const Login: React.FC = () => {
         >
           MANA NIVAS
         </motion.h1>
-        <motion.p 
+        <motion.p
           className="auth-desc"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -87,10 +79,10 @@ const Login: React.FC = () => {
           Your home away from home
         </motion.p>
       </div>
-      
+
       <div className="auth-right">
-        <motion.form 
-          className="auth-form" 
+        <motion.form
+          className="auth-form"
           onSubmit={handleSubmit}
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
@@ -98,59 +90,57 @@ const Login: React.FC = () => {
         >
           <h2>Welcome Back</h2>
           <p className="auth-subtitle">Sign in to your account</p>
-          
+          {showError && errorMessage && (
+            <div className="auth-error-wrap">
+              <ErrorAlert message={errorMessage} onClose={() => setShowError(false)} type="error" />
+            </div>
+          )}
+
           <div className="form-group">
             <label htmlFor="email" className="form-label">Email Address</label>
-          <input
-            className="auth-input input-primary"
-            type="email"
+            <input
+              className="auth-input input-primary"
+              type="email"
               id="email"
-            name="email"
+              name="email"
               placeholder="Enter your email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            disabled={loading}
-          />
+              value={formData.email}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="password" className="form-label">Password</label>
             <div className="password-input-container">
-          <input
-            className="auth-input input-primary"
-                type={showPassword ? "text" : "password"}
+              <input
+                className="auth-input input-primary"
+                type={showPassword ? 'text' : 'password'}
                 id="password"
-            name="password"
+                name="password"
                 placeholder="Enter your password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            disabled={loading}
-          />
+                value={formData.password}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              />
               <button
                 type="button"
                 className="password-toggle"
                 onClick={() => setShowPassword(!showPassword)}
                 disabled={loading}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
-                {showPassword ? "👁️" : "👁️‍🗨️"}
+                {showPassword ? 'Hide' : 'Show'}
               </button>
             </div>
           </div>
-          
-          <button 
-            className="auth-button btn-primary" 
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? (
-              <LoadingSpinner size="small" message="" />
-            ) : (
-              'Sign In'
-            )}
+
+          <button className="auth-button btn-primary" type="submit" disabled={loading}>
+            {loading ? <LoadingSpinner size="small" message="" /> : 'Sign In'}
           </button>
-          
+
           <div className="auth-switch">
             Don't have an account?
             <Link to="/register" className="auth-link">Create Account</Link>
@@ -161,4 +151,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login; 
+export default Login;

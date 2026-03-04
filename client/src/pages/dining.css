@@ -5,7 +5,7 @@
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 80px 20px 0;
+  padding: 0 20px;
   min-height: 100vh;
   background: linear-gradient(to bottom, var(--ivory) 0%, var(--off-white) 100%);
 }
@@ -185,7 +185,7 @@
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: #333;
+  color: var(--charcoal);
 }
 
 .dish-hover {
@@ -217,7 +217,7 @@
 /* Dining Venues Section */
 .dining-venues-section {
   padding: 2rem 5%;
-  background-color: #f8f8f8;
+  background-color: var(--off-white);
 }
 
 .dining-venues-grid {
@@ -228,15 +228,17 @@
 }
 
 .venue-card {
-  border-radius: 12px;
+  border-radius: 1rem;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  background-color: white;
-  transition: transform 0.3s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  background-color: var(--white);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(196, 155, 59, 0.14);
 }
 
 .venue-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.12);
 }
 
 .venue-image {
@@ -264,23 +266,23 @@
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: #333;
+  color: var(--charcoal);
 }
 
 .venue-info p {
-  color: #666;
+  color: var(--text-light);
   margin-bottom: 0.5rem;
 }
 
 .venue-info span {
-  color: #888;
+  color: var(--text-muted);
   font-size: 0.9rem;
 }
 
 /* Responsive Design */
 @media (max-width: 1024px) {
   .dining-page {
-    padding: 60px 15px 0;
+    padding: 0 15px;
   }
   
   .dining-hero {
@@ -304,7 +306,7 @@
 
 @media (max-width: 768px) {
   .dining-page {
-    padding: 40px 10px 0;
+    padding: 0 10px;
   }
   
   .dining-hero {
@@ -340,7 +342,7 @@
 
 @media (max-width: 480px) {
   .dining-page {
-    padding: 20px 5px 0;
+    padding: 0 5px;
   }
   
   .dining-hero {

@@ -48,7 +48,7 @@ const Register: React.FC = () => {
       setLoading(true);
 
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: formData.email,
+        email: formData.email.trim().toLowerCase(),
         password: formData.password,
         options: {
           data: {
@@ -67,17 +67,6 @@ const Register: React.FC = () => {
         throw new Error('Signup completed but no user was returned. Please try logging in.');
       }
 
-      const { error: profileError } = await supabase.from('profiles').insert({
-        id: user.id,
-        full_name: formData.name,
-        phone: formData.phone,
-        role: 'user',
-      });
-
-      if (profileError) {
-        throw new Error(profileError.message || 'Account created, but failed to save profile.');
-      }
-
       navigate('/login');
     } catch (err: any) {
       setErrorMessage(err?.message || 'Registration failed. Please try again.');
@@ -93,8 +82,7 @@ const Register: React.FC = () => {
       ...prev,
       [name]: value,
     }));
-    
-    // Clear password error when user types
+
     if (name === 'password' || name === 'confirmPassword') {
       setPasswordError('');
     }
@@ -102,16 +90,8 @@ const Register: React.FC = () => {
 
   return (
     <div className="auth-page">
-      {showError && errorMessage && (
-        <ErrorAlert 
-          message={errorMessage}
-          onClose={() => setShowError(false)}
-          type="error"
-        />
-      )}
-      
       <div className="auth-left">
-        <motion.div 
+        <motion.div
           className="auth-logo"
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -120,7 +100,7 @@ const Register: React.FC = () => {
           <div className="logo-sparkle"></div>
           <img src="/logo.jpg" alt="Logo" />
         </motion.div>
-        <motion.h1 
+        <motion.h1
           className="auth-brand"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -128,7 +108,7 @@ const Register: React.FC = () => {
         >
           MANA NIVAS
         </motion.h1>
-        <motion.p 
+        <motion.p
           className="auth-desc"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -137,10 +117,10 @@ const Register: React.FC = () => {
           Your home away from home
         </motion.p>
       </div>
-      
+
       <div className="auth-right">
-        <motion.form 
-          className="auth-form" 
+        <motion.form
+          className="auth-form"
           onSubmit={handleSubmit}
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
@@ -148,35 +128,40 @@ const Register: React.FC = () => {
         >
           <h2>Create Account</h2>
           <p className="auth-subtitle">Join us for an amazing experience</p>
-          
+          {showError && errorMessage && (
+            <div className="auth-error-wrap">
+              <ErrorAlert message={errorMessage} onClose={() => setShowError(false)} type="error" />
+            </div>
+          )}
+
           <div className="form-group">
             <label htmlFor="name" className="form-label">Full Name</label>
-          <input
-            className="auth-input input-primary"
-            type="text"
+            <input
+              className="auth-input input-primary"
+              type="text"
               id="name"
-            name="name"
+              name="name"
               placeholder="Enter your full name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            disabled={loading}
-          />
+              value={formData.name}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="email" className="form-label">Email Address</label>
-          <input
-            className="auth-input input-primary"
-            type="email"
+            <input
+              className="auth-input input-primary"
+              type="email"
               id="email"
-            name="email"
+              name="email"
               placeholder="Enter your email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            disabled={loading}
-          />
+              value={formData.email}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
           </div>
 
           <div className="form-group">
@@ -193,75 +178,65 @@ const Register: React.FC = () => {
               disabled={loading}
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="password" className="form-label">Password</label>
             <div className="password-input-container">
-          <input
-            className="auth-input input-primary"
-                type={showPassword ? "text" : "password"}
+              <input
+                className="auth-input input-primary"
+                type={showPassword ? 'text' : 'password'}
                 id="password"
-            name="password"
+                name="password"
                 placeholder="Create a password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            disabled={loading}
-          />
+                value={formData.password}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              />
               <button
                 type="button"
                 className="password-toggle"
                 onClick={() => setShowPassword(!showPassword)}
                 disabled={loading}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
-                {showPassword ? "👁️" : "👁️‍🗨️"}
+                {showPassword ? 'Hide' : 'Show'}
               </button>
             </div>
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
             <div className="password-input-container">
-          <input
-            className="auth-input input-primary"
-                type={showConfirmPassword ? "text" : "password"}
+              <input
+                className="auth-input input-primary"
+                type={showConfirmPassword ? 'text' : 'password'}
                 id="confirmPassword"
-            name="confirmPassword"
+                name="confirmPassword"
                 placeholder="Confirm your password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-            disabled={loading}
-          />
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              />
               <button
                 type="button"
                 className="password-toggle"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 disabled={loading}
+                aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
               >
-                {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
+                {showConfirmPassword ? 'Hide' : 'Show'}
               </button>
             </div>
           </div>
 
-          {passwordError && (
-            <div className="error-message">
-              {passwordError}
-            </div>
-          )}
-          
-          <button 
-            className="auth-button btn-primary" 
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? (
-              <LoadingSpinner size="small" message="" />
-            ) : (
-              'Create Account'
-            )}
+          {passwordError && <div className="auth-inline-error">{passwordError}</div>}
+
+          <button className="auth-button btn-primary" type="submit" disabled={loading}>
+            {loading ? <LoadingSpinner size="small" message="" /> : 'Create Account'}
           </button>
-          
+
           <div className="auth-switch">
             Already have an account?
             <Link to="/login" className="auth-link">Sign In</Link>
@@ -272,4 +247,4 @@ const Register: React.FC = () => {
   );
 };
 
-export default Register; 
+export default Register;

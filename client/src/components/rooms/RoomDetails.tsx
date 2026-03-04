@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { supabase } from '../../supabaseClient';
 import { BookingPayload, Room, toRoom } from '../../types/supabase';
 import { useAuth } from '../../context/AuthContext';
+import { ensureRoomAvailability } from '../../lib/booking';
 import './RoomDetails.css';
 
 const RoomDetails: React.FC = () => {
@@ -17,6 +18,17 @@ const RoomDetails: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
+
+  const nightlyRate = room?.price ?? 0;
+  const nights = useMemo(() => {
+    if (!checkIn || !checkOut) return 0;
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+    const diff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    return diff > 0 ? diff : 0;
+  }, [checkIn, checkOut]);
+
+  const bookingError = error && room ? error : '';
 
   useEffect(() => {
     fetchRoomDetails();
@@ -38,18 +50,17 @@ const RoomDetails: React.FC = () => {
 
   const handleBookNow = async () => {
     if (!user) {
-      alert('Please log in to book a room');
       navigate('/login');
       return;
     }
 
     if (!checkIn || !checkOut) {
-      alert('Please select check-in and check-out dates');
+      setError('Please select check-in and check-out dates');
       return;
     }
 
     if (!room) {
-      alert('Room information not available');
+      setError('Room information not available');
       return;
     }
 
@@ -63,6 +74,8 @@ const RoomDetails: React.FC = () => {
         checkOut: new Date(checkOut).toISOString(),
         totalPrice: calculateTotal(),
       };
+
+      await ensureRoomAvailability(bookingData.roomId, bookingData.checkIn, bookingData.checkOut);
 
       const { data: createdBooking, error: createError } = await supabase
         .from('bookings')
@@ -99,10 +112,7 @@ const RoomDetails: React.FC = () => {
   };
 
   const calculateTotal = () => {
-    if (!room || !checkIn || !checkOut) return 0;
-    const start = new Date(checkIn);
-    const end = new Date(checkOut);
-    const nights = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    if (!room || nights <= 0) return 0;
     return room.price * nights;
   };
 
@@ -170,27 +180,32 @@ const RoomDetails: React.FC = () => {
       </div>
 
       <div className="room-info-grid">
-        <div className="room-description">
-          <h2>Description</h2>
-          <p>{room.description}</p>
-        </div>
+        <section className="room-main-content">
+          <div className="room-description">
+            <h2>Description</h2>
+            <p>{room.description}</p>
+          </div>
 
-        <div className="room-amenities">
-          <h2>Amenities</h2>
-          <ul className="amenities-list">
-            {room.amenities.map((amenity, index) => (
-              <li key={index}>{amenity}</li>
-            ))}
-          </ul>
-        </div>
+          <div className="room-amenities">
+            <h2>Included Amenities</h2>
+            <ul className="amenities-list">
+              {room.amenities.map((amenity, index) => (
+                <li key={index}>{amenity}</li>
+              ))}
+            </ul>
+          </div>
+        </section>
 
-        <div className="room-booking">
+        <aside className="room-booking">
+          <h3>Reserve This Suite</h3>
+          <p className="booking-note">Best available rate for your selected stay dates.</p>
+
           <div className="booking-dates">
-            <h3>Select Your Dates</h3>
             <div className="date-inputs">
               <div className="date-input">
-                <label>Check-in Date</label>
+                <label htmlFor="checkIn">Check-in Date</label>
                 <input
+                  id="checkIn"
                   type="date"
                   value={checkIn}
                   onChange={(e) => setCheckIn(e.target.value)}
@@ -198,8 +213,9 @@ const RoomDetails: React.FC = () => {
                 />
               </div>
               <div className="date-input">
-                <label>Check-out Date</label>
+                <label htmlFor="checkOut">Check-out Date</label>
                 <input
+                  id="checkOut"
                   type="date"
                   value={checkOut}
                   onChange={(e) => setCheckOut(e.target.value)}
@@ -209,30 +225,40 @@ const RoomDetails: React.FC = () => {
             </div>
           </div>
 
-          {error && (
-            <div className="error-message">
-              {error}
+          {bookingError && (
+            <div className="booking-inline-error" role="alert">
+              {bookingError}
             </div>
           )}
 
           <div className="price-tag">
-            <span className="amount">${room.price.toLocaleString()}</span>
-            <span className="per-night">per night</span>
-            {checkIn && checkOut && (
-              <div className="total-price">
-                <span>Total: ${calculateTotal().toLocaleString()}</span>
-              </div>
-            )}
+            <div className="rate-row">
+              <span className="rate-label">Nightly Rate</span>
+              <span className="amount">${nightlyRate.toLocaleString()}</span>
+            </div>
+            <div className="rate-row subtle">
+              <span>Stay length</span>
+              <span>{nights > 0 ? `${nights} night${nights > 1 ? 's' : ''}` : '-'}</span>
+            </div>
+            <div className="rate-row total">
+              <span>Total</span>
+              <span>${calculateTotal().toLocaleString()}</span>
+            </div>
           </div>
-          
-          <button 
+
+          <ul className="booking-trust-list">
+            <li>Secure checkout with encrypted payment flow</li>
+            <li>No cancellation penalty within allowed policy window</li>
+          </ul>
+
+          <button
             className="book-now-btn"
             onClick={handleBookNow}
-            disabled={!checkIn || !checkOut || bookingLoading}
+            disabled={!checkIn || !checkOut || nights <= 0 || bookingLoading}
           >
             {bookingLoading ? 'Creating Booking...' : 'Book Now'}
           </button>
-        </div>
+        </aside>
       </div>
     </motion.div>
   );

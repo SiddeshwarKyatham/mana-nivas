@@ -6,6 +6,7 @@ import './BookingForm.css';
 import { supabase } from '../../supabaseClient';
 import { BookingPayload, Room, toRoom } from '../../types/supabase';
 import { useAuth } from '../../context/AuthContext';
+import { ensureRoomAvailability } from '../../lib/booking';
 
 interface BookingFormData {
   checkIn: Date | null;
@@ -110,6 +111,8 @@ const BookingForm: React.FC = () => {
         checkOut: formData.checkOut.toISOString(),
         totalPrice: room.price * nights,
       };
+
+      await ensureRoomAvailability(bookingData.roomId, bookingData.checkIn, bookingData.checkOut);
 
       const { data: response, error: createError } = await supabase
         .from('bookings')

@@ -25,14 +25,13 @@ const mapSupabaseUser = (supabaseUser: SupabaseUser | null, profile?: { full_nam
 
   const metadata = supabaseUser.user_metadata || {};
   const fullName = profile?.full_name || (metadata.full_name as string) || '';
-  const roleFromProfile = profile?.role === 'admin' ? 'admin' : profile?.role === 'user' ? 'user' : null;
-  const roleFromMetadata = (metadata.role as 'user' | 'admin') || 'user';
+  const resolvedRole: 'user' | 'admin' = profile?.role === 'admin' ? 'admin' : 'user';
 
   return {
     _id: supabaseUser.id,
     name: fullName || supabaseUser.email?.split('@')[0] || 'User',
     email: supabaseUser.email || '',
-    role: roleFromProfile || roleFromMetadata,
+    role: resolvedRole,
   };
 };
 
@@ -82,9 +81,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+      if (!isMounted) return;
       setSession(newSession);
       const supabaseUser = newSession?.user ?? null;
       const profile = supabaseUser ? await getProfile(supabaseUser.id) : undefined;
+      if (!isMounted) return;
       setUser(mapSupabaseUser(supabaseUser, profile));
       setLoading(false);
     });

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { supabase } from '../supabaseClient';
 import { BookingPayload, Room, toRoom } from '../types/supabase';
 import { useAuth } from '../context/AuthContext';
+import { ensureRoomAvailability } from '../lib/booking';
 import './payment.css';
 
 interface PaymentFormData {
@@ -33,6 +34,14 @@ const Payment: React.FC = () => {
     city: '',
     zipCode: '',
   });
+
+  const nights = React.useMemo(() => {
+    if (!checkIn || !checkOut) return 0;
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+    const diff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    return diff > 0 ? diff : 0;
+  }, [checkIn, checkOut]);
 
   useEffect(() => {
     const fetchRoom = async () => {
@@ -64,10 +73,7 @@ const Payment: React.FC = () => {
   };
 
   const calculateTotal = () => {
-    if (!room || !checkIn || !checkOut) return 0;
-    const start = new Date(checkIn);
-    const end = new Date(checkOut);
-    const nights = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    if (!room || nights <= 0) return 0;
     return room.price * nights;
   };
 
@@ -95,6 +101,8 @@ const Payment: React.FC = () => {
         checkOut: new Date(checkOut).toISOString(),
         totalPrice: calculateTotal(),
       };
+
+      await ensureRoomAvailability(bookingData.roomId, bookingData.checkIn, bookingData.checkOut);
 
       const { data: booking, error: bookingError } = await supabase
         .from('bookings')
@@ -181,6 +189,7 @@ const Payment: React.FC = () => {
         <div className="payment-content">
           <div className="booking-summary">
             <h3>Booking Summary</h3>
+            <p className="summary-subtitle">Your selected stay details and charges.</p>
             <div className="summary-item">
               <span>Room:</span>
               <span>{room.name}</span>
@@ -195,12 +204,21 @@ const Payment: React.FC = () => {
             </div>
             <div className="summary-item">
               <span>Price per night:</span>
-              <span>${room.price}</span>
+              <span>${room.price.toLocaleString()}</span>
+            </div>
+            <div className="summary-item">
+              <span>Nights:</span>
+              <span>{nights}</span>
             </div>
             <div className="summary-item total">
               <span>Total:</span>
-              <span>${calculateTotal()}</span>
+              <span>${calculateTotal().toLocaleString()}</span>
             </div>
+            <ul className="payment-trust-list">
+              <li>Secure and encrypted checkout session</li>
+              <li>No hidden processing charges</li>
+              <li>Instant confirmation after successful payment</li>
+            </ul>
           </div>
 
           <form onSubmit={handleSubmit} className="payment-form">
@@ -324,7 +342,7 @@ const Payment: React.FC = () => {
                 className="btn-primary"
                 disabled={processing}
               >
-                {processing ? 'Processing...' : `Pay $${calculateTotal()}`}
+                {processing ? 'Processing...' : `Pay $${calculateTotal().toLocaleString()}`}
               </button>
             </div>
           </form>

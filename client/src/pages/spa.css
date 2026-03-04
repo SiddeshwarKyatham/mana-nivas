@@ -3,7 +3,7 @@
 
 .spa-page {
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background-color: var(--ivory);
 }
 
 /* Hero Section - Now using unified styles */
@@ -84,15 +84,16 @@
 /* Treatments Section */
 .spa-treatments-section {
   padding: 5rem 2rem;
-  background-color: white;
+  background-color: var(--white);
 }
 
 .spa-section-title {
   text-align: center;
   font-size: 2.5rem;
-  color: #2c3e50;
+  color: var(--charcoal);
   margin-bottom: 3rem;
   font-weight: 600;
+  font-family: 'Playfair Display', serif;
 }
 
 .spa-treatments-grid {
@@ -104,15 +105,17 @@
 }
 
 .treatment-card {
-  background: white;
+  background: var(--white);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(196, 155, 59, 0.14);
 }
 
 .treatment-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.12);
 }
 
 .treatment-image {
@@ -137,19 +140,19 @@
 
 .treatment-info h3 {
   font-size: 1.5rem;
-  color: #2c3e50;
+  color: var(--charcoal);
   margin-bottom: 0.5rem;
 }
 
 .treatment-info p {
-  color: #666;
+  color: var(--text-light);
   margin-bottom: 1rem;
   line-height: 1.6;
 }
 
 .treatment-info span {
   display: block;
-  color: #e67e22;
+  color: var(--gold);
   font-weight: 600;
   font-size: 1.1rem;
 }
@@ -157,7 +160,7 @@
 /* Ambiance Gallery Section */
 .spa-ambiance-section {
   padding: 5rem 2rem;
-  background-color: #f8f9fa;
+  background-color: var(--off-white);
 }
 
 .spa-ambiance-gallery {
@@ -169,15 +172,17 @@
 }
 
 .ambiance-card {
-  background: white;
+  background: var(--white);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(196, 155, 59, 0.14);
 }
 
 .ambiance-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.12);
 }
 
 .ambiance-image {
@@ -202,12 +207,12 @@
 
 .ambiance-info h3 {
   font-size: 1.5rem;
-  color: #2c3e50;
+  color: var(--charcoal);
   margin-bottom: 1rem;
 }
 
 .ambiance-info p {
-  color: #666;
+  color: var(--text-light);
   line-height: 1.6;
   font-size: 1rem;
 }

@@ -4,6 +4,7 @@ import { supabase } from '../../supabaseClient';
 import { Room, toRoom } from '../../types/supabase';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import ErrorAlert from '../../components/shared/ErrorAlert';
+import ConfirmDialog from '../../components/shared/ConfirmDialog';
 import ImageUpload from '../../components/admin/ImageUpload';
 import './RoomManagement.css';
 
@@ -33,6 +34,7 @@ const RoomManagement: React.FC = () => {
   });
   const [newAmenity, setNewAmenity] = useState('');
   const [showError, setShowError] = useState(false);
+  const [pendingDeleteRoomId, setPendingDeleteRoomId] = useState<string | null>(null);
 
   const fetchRooms = async () => {
     setLoading(true);
@@ -149,8 +151,6 @@ const RoomManagement: React.FC = () => {
   };
 
   const handleDelete = async (roomId: string) => {
-    if (!window.confirm('Are you sure you want to delete this room?')) return;
-
     try {
       const { error: deleteError } = await supabase.from('rooms').delete().eq('id', roomId);
       if (deleteError) {
@@ -160,6 +160,8 @@ const RoomManagement: React.FC = () => {
     } catch (err: any) {
       setError(err?.message || 'Error deleting room');
       setShowError(true);
+    } finally {
+      setPendingDeleteRoomId(null);
     }
   };
 
@@ -284,7 +286,7 @@ const RoomManagement: React.FC = () => {
 
               <div className="room-actions">
                 <button onClick={() => handleEdit(room)} className="btn btn-secondary">Edit</button>
-                <button onClick={() => handleDelete(room.id)} className="btn btn-danger">Delete</button>
+                <button onClick={() => setPendingDeleteRoomId(room.id)} className="btn btn-danger">Delete</button>
               </div>
 
               <ImageUpload
@@ -296,6 +298,20 @@ const RoomManagement: React.FC = () => {
           </motion.div>
         ))}
       </div>
+      <ConfirmDialog
+        open={Boolean(pendingDeleteRoomId)}
+        title="Delete room?"
+        message="This permanently removes the room record. Existing bookings may lose room references."
+        confirmLabel="Delete room"
+        cancelLabel="Cancel"
+        danger
+        onCancel={() => setPendingDeleteRoomId(null)}
+        onConfirm={() => {
+          if (pendingDeleteRoomId) {
+            handleDelete(pendingDeleteRoomId);
+          }
+        }}
+      />
     </div>
   );
 };

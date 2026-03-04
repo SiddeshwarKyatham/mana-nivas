@@ -1,12 +1,11 @@
 import React from 'react';
+import { FaClock, FaEnvelope, FaMapMarkerAlt, FaPhoneAlt } from 'react-icons/fa';
 import './contact.css';
 import contactHero from '../assets/contact-hero.jpg';
-import contactReception from '../assets/contact-reception.jpg';
 
 const Contact = () => {
   return (
     <div className="contact-page">
-      {/* Hero Section */}
       <section className="contact-hero">
         <div className="contact-hero-image">
           <img src={contactHero} alt="Contact MANA NIVAS" />
@@ -17,31 +16,38 @@ const Contact = () => {
         </div>
       </section>
 
-      {/* Contact Info and Map Section */}
       <div className="contact-info-map-container">
         <div className="contact-info-wrapper">
           <div className="contact-info-grid">
             <div className="contact-info-card">
-              <div className="contact-info-icon">📍</div>
+              <div className="contact-info-icon" aria-hidden="true">
+                <FaMapMarkerAlt />
+              </div>
               <h3>Location</h3>
               <p>123 Luxury Avenue</p>
               <p>Mumbai, Maharashtra 400001</p>
               <p>India</p>
             </div>
             <div className="contact-info-card">
-              <div className="contact-info-icon">📞</div>
+              <div className="contact-info-icon" aria-hidden="true">
+                <FaPhoneAlt />
+              </div>
               <h3>Phone</h3>
               <p>+91 22 1234 5678</p>
               <p>+91 98765 43210</p>
             </div>
             <div className="contact-info-card">
-              <div className="contact-info-icon">✉️</div>
+              <div className="contact-info-icon" aria-hidden="true">
+                <FaEnvelope />
+              </div>
               <h3>Email</h3>
               <p>info@mananivas.com</p>
               <p>reservations@mananivas.com</p>
             </div>
             <div className="contact-info-card">
-              <div className="contact-info-icon">⏰</div>
+              <div className="contact-info-icon" aria-hidden="true">
+                <FaClock />
+              </div>
               <h3>Hours</h3>
               <p>24/7 Front Desk</p>
               <p>Check-in: 2 PM</p>
@@ -67,4 +73,4 @@ const Contact = () => {
   );
 };
 
-export default Contact; 
+export default Contact;

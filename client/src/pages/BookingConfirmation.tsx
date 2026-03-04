@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaCheckCircle, FaHome, FaEnvelope, FaCreditCard } from 'react-icons/fa';
+import { FaCheckCircle, FaHome, FaEnvelope, FaPhone } from 'react-icons/fa';
 import { Room } from '../types/supabase';
 import './BookingConfirmation.css';
 
@@ -16,16 +16,16 @@ const BookingConfirmation: React.FC = () => {
   const location = useLocation();
   const bookingData = location.state as BookingConfirmationData;
 
-  const generateBookingReference = () => {
-    return 'MN' + Math.random().toString(36).substring(2, 10).toUpperCase();
-  };
-
   const calculateNights = () => {
     if (!bookingData?.checkIn || !bookingData?.checkOut) return 0;
     const start = new Date(bookingData.checkIn);
     const end = new Date(bookingData.checkOut);
     return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
   };
+
+  const bookingReference = bookingData?.booking?.id
+    ? String(bookingData.booking.id).slice(0, 8).toUpperCase()
+    : 'PENDING';
 
   if (!bookingData) {
     return (
@@ -58,7 +58,7 @@ const BookingConfirmation: React.FC = () => {
           <div className="details-grid">
             <div className="detail-item">
               <span className="label">Booking Reference:</span>
-              <span className="value">{bookingData.booking?.id || generateBookingReference()}</span>
+              <span className="value">MN-{bookingReference}</span>
             </div>
             <div className="detail-item">
               <span className="label">Room:</span>
@@ -82,11 +82,11 @@ const BookingConfirmation: React.FC = () => {
             </div>
             <div className="detail-item">
               <span className="label">Price per Night:</span>
-              <span className="value">${bookingData.room.price}</span>
+              <span className="value">${bookingData.room.price.toLocaleString()}</span>
             </div>
             <div className="detail-item total-item">
               <span className="label">Total Amount:</span>
-              <span className="value">${bookingData.total}</span>
+              <span className="value">${bookingData.total.toLocaleString()}</span>
             </div>
           </div>
         </div>
@@ -100,7 +100,7 @@ const BookingConfirmation: React.FC = () => {
           <Link to="/dashboard" className="dashboard-button">
             <FaHome /> View My Bookings
           </Link>
-          <button className="email-button" onClick={() => window.print()}>
+          <button className="email-button" onClick={() => window.print()} type="button">
             <FaEnvelope /> Print Confirmation
           </button>
         </div>
@@ -120,8 +120,8 @@ const BookingConfirmation: React.FC = () => {
         <div className="contact-info">
           <h3>Need Help?</h3>
           <p>Contact our reservations team:</p>
-          <p>📞 +1 (555) 123-4567</p>
-          <p>📧 reservations@mananivas.com</p>
+          <p><FaPhone /> +1 (555) 123-4567</p>
+          <p><FaEnvelope /> reservations@mananivas.com</p>
         </div>
       </div>
     </div>
@@ -129,3 +129,4 @@ const BookingConfirmation: React.FC = () => {
 };
 
 export default BookingConfirmation; 
+

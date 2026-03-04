@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import { supabase } from '../../supabaseClient';
+import '../AdminDashboard.css';
 
 interface AdminUser {
   id: string;
@@ -42,37 +43,53 @@ const AdminUsers: React.FC = () => {
   }, [authLoading, isAuthenticated, user]);
 
   if (authLoading || loading) {
-    return <LoadingSpinner size="large" message="Loading users..." />;
+    return (
+      <div className="admin-dashboard-container admin-subpage">
+        <LoadingSpinner size="large" message="Loading users..." />
+      </div>
+    );
   }
 
   if (error) {
-    return <div style={{ color: 'red' }}>{error}</div>;
+    return (
+      <div className="admin-dashboard-container admin-subpage">
+        <div className="admin-table-wrapper">
+          <p className="admin-inline-error">{error}</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="admin-table-wrapper">
-      <h1>Users</h1>
-      <div style={{ marginBottom: '1rem' }}>Total: {users.length}</div>
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Phone</th>
-            <th>Role</th>
-            <th>Joined</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((u) => (
-            <tr key={u.id}>
-              <td>{u.full_name || 'Unknown'}</td>
-              <td>{u.phone || '-'}</td>
-              <td>{u.role}</td>
-              <td>{u.created_at ? new Date(u.created_at).toLocaleDateString() : '-'}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="admin-dashboard-container admin-subpage">
+      <div className="admin-table-wrapper">
+        <h1>Users</h1>
+        <div className="admin-kpis">
+          <div className="admin-kpi">Total: {users.length}</div>
+        </div>
+        <div className="admin-table-scroll">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>Joined</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((u) => (
+                <tr key={u.id}>
+                  <td>{u.full_name || 'Unknown'}</td>
+                  <td>{u.phone || '-'}</td>
+                  <td>{u.role}</td>
+                  <td>{u.created_at ? new Date(u.created_at).toLocaleDateString() : '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };

@@ -190,7 +190,7 @@
 }
 
 .amenities-list li::before {
-  content: "•";
+  content: "\\2022";
   color: var(--gold);
   font-size: 1.5rem;
 }

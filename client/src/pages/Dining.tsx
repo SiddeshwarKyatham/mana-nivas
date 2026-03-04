@@ -92,9 +92,9 @@ const Dining = () => {
   return (
     <div className="dining-page">
       {/* Hero Banner */}
-      <section className="dining-hero" style={{ marginTop: '80px' }}>
+      <section className="dining-hero">
         <div className="dining-hero-image">
-          <img src={diningHero} alt="Luxury Dining Experience" />
+          <img src={diningHero} alt="Luxury Dining Experience" loading="eager" fetchPriority="high" decoding="async" />
         </div>
         <div className="dining-hero-content">
           <h1 className="dining-hero-headline">A Feast for the Senses</h1>
@@ -109,7 +109,7 @@ const Dining = () => {
           {signatureDishes.map((dish, index) => (
             <div key={index} className="dish-card">
               <div className="dish-image">
-                <img src={dish.image} alt={dish.name} />
+                <img src={dish.image} alt={dish.name} loading="lazy" decoding="async" />
               </div>
               <div className="dish-info">
                 <h3>{dish.name}</h3>
@@ -130,7 +130,7 @@ const Dining = () => {
           {diningVenues.map((venue, index) => (
             <div key={index} className="venue-card">
               <div className="venue-image">
-                <img src={venue.image} alt={venue.name} />
+                <img src={venue.image} alt={venue.name} loading="lazy" decoding="async" />
               </div>
               <div className="venue-info">
                 <h3>{venue.name}</h3>

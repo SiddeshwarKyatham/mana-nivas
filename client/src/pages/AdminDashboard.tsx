@@ -4,6 +4,7 @@ import { FaUsers, FaBed, FaCalendarAlt, FaChartBar } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
+import ConfirmDialog from '../components/shared/ConfirmDialog';
 import './AdminDashboard.css';
 
 interface DashboardBooking {
@@ -34,6 +35,7 @@ const AdminDashboard: React.FC = () => {
   const [error, setError] = useState('');
   const [usersError, setUsersError] = useState('');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [pendingCancelId, setPendingCancelId] = useState<string | null>(null);
 
   useEffect(() => {
     if (authLoading) return;
@@ -88,16 +90,16 @@ const AdminDashboard: React.FC = () => {
   };
 
   const handleCancel = async (bookingId: string) => {
-    if (!window.confirm('Cancel this booking?')) return;
     setUpdatingId(bookingId);
     try {
       const { error: cancelError } = await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', bookingId);
       if (cancelError) throw new Error(cancelError.message || 'Error cancelling booking');
       await fetchBookings();
     } catch (err: any) {
-      alert(err?.message || 'Error cancelling booking');
+      setError(err?.message || 'Error cancelling booking');
     } finally {
       setUpdatingId(null);
+      setPendingCancelId(null);
     }
   };
 
@@ -132,79 +134,102 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {loading ? (
-        <p>Loading bookings...</p>
+        <p className="admin-loading-text">Loading bookings...</p>
       ) : error ? (
-        <p style={{ color: 'red' }}>{error}</p>
+        <p className="admin-inline-error">{error}</p>
       ) : (
         <div className="admin-table-wrapper">
           <h2>Recent Bookings</h2>
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>User</th>
-                <th>Room</th>
-                <th>Dates</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bookings.slice(0, 20).map((b) => (
-                <tr key={b.id}>
-                  <td>{b.id}</td>
-                  <td>
-                    <div>{b.profiles?.full_name || 'Unknown user'}</div>
-                    <div style={{ fontSize: '12px', color: '#555' }}>{b.profiles?.phone || '-'}</div>
-                  </td>
-                  <td>
-                    <strong>{b.rooms?.name || 'Unknown room'}</strong> {b.rooms?.type ? `(${b.rooms.type})` : ''}
-                  </td>
-                  <td>{new Date(b.check_in).toLocaleDateString()} to {new Date(b.check_out).toLocaleDateString()}</td>
-                  <td>{b.status}</td>
-                  <td>
-                    {b.status === 'booked' && (
-                      <button disabled={updatingId === b.id} onClick={() => handleCancel(b.id)}>
-                        {updatingId === b.id ? 'Cancelling...' : 'Cancel'}
-                      </button>
-                    )}
-                  </td>
+          <div className="admin-table-scroll">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>User</th>
+                  <th>Room</th>
+                  <th>Dates</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {bookings.slice(0, 20).map((b) => (
+                  <tr key={b.id}>
+                    <td>{b.id}</td>
+                    <td>
+                      <div>{b.profiles?.full_name || 'Unknown user'}</div>
+                      <div className="admin-meta">{b.profiles?.phone || '-'}</div>
+                    </td>
+                    <td>
+                      <strong>{b.rooms?.name || 'Unknown room'}</strong> {b.rooms?.type ? `(${b.rooms.type})` : ''}
+                    </td>
+                    <td>{new Date(b.check_in).toLocaleDateString()} to {new Date(b.check_out).toLocaleDateString()}</td>
+                    <td>
+                      <span className={`status-chip ${b.status === 'booked' ? 'booked' : b.status === 'cancelled' ? 'cancelled' : 'pending'}`}>
+                        {b.status}
+                      </span>
+                    </td>
+                    <td>
+                      {b.status === 'booked' && (
+                        <button disabled={updatingId === b.id} onClick={() => setPendingCancelId(b.id)}>
+                          {updatingId === b.id ? 'Cancelling...' : 'Cancel'}
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
       {usersLoading ? (
-        <p>Loading users...</p>
+        <p className="admin-loading-text">Loading users...</p>
       ) : usersError ? (
-        <p style={{ color: 'red' }}>{usersError}</p>
+        <p className="admin-inline-error">{usersError}</p>
       ) : (
-        <div className="admin-table-wrapper" style={{ marginTop: '2rem' }}>
+        <div className="admin-table-wrapper admin-section-gap">
           <h2>Recent Users</h2>
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Role</th>
-                <th>Joined</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.slice(0, 20).map((u) => (
-                <tr key={u.id}>
-                  <td>{u.full_name || 'Unknown'}</td>
-                  <td>{u.phone || '-'}</td>
-                  <td>{u.role}</td>
-                  <td>{u.created_at ? new Date(u.created_at).toLocaleDateString() : '-'}</td>
+          <div className="admin-table-scroll">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Role</th>
+                  <th>Joined</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {users.slice(0, 20).map((u) => (
+                  <tr key={u.id}>
+                    <td>{u.full_name || 'Unknown'}</td>
+                    <td>{u.phone || '-'}</td>
+                    <td>{u.role}</td>
+                    <td>{u.created_at ? new Date(u.created_at).toLocaleDateString() : '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
+      <ConfirmDialog
+        open={Boolean(pendingCancelId)}
+        title="Cancel booking?"
+        message="This will mark the booking as cancelled. You can keep it for audit history."
+        confirmLabel="Yes, cancel booking"
+        cancelLabel="Keep booking"
+        danger
+        busy={Boolean(updatingId)}
+        onCancel={() => setPendingCancelId(null)}
+        onConfirm={() => {
+          if (pendingCancelId) {
+            handleCancel(pendingCancelId);
+          }
+        }}
+      />
     </div>
   );
 };

@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { Room, toRoom } from '../types/supabase';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
 import ErrorAlert from '../components/shared/ErrorAlert';
-import Navbar from '../components/layout/Navbar';
 import hero1 from '../assets/hero1.jpg';
 import hero2 from '../assets/hero2.jpg';
 import hero3 from '../assets/hero3.jpg';
@@ -47,9 +46,6 @@ const heroCaptions = [
   },
 ];
 
-const minPrice = 0;
-const maxPrice = 1000;
-
 // Star rating component
 const StarRating: React.FC<{ rating: number; size?: 'small' | 'medium' | 'large' }> = ({ rating, size = 'medium' }) => {
   const sizeClass = {
@@ -76,12 +72,12 @@ const StarRating: React.FC<{ rating: number; size?: 'small' | 'medium' | 'large'
 };
 
 const Home: React.FC = () => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [current, setCurrent] = useState(0);
   const [autoPlay, setAutoPlay] = useState(true);
   const [filteredRooms, setFilteredRooms] = useState<Room[]>([]);
   const [selectedType, setSelectedType] = useState('all');
-  const [priceRange, setPriceRange] = useState([minPrice, maxPrice]);
   const [showError, setShowError] = useState(false);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
@@ -118,7 +114,7 @@ const Home: React.FC = () => {
     return () => clearTimeout(timer);
   }, [current, autoPlay]);
 
-  // Filter rooms on search/type/price
+  // Filter rooms on search/type
   useEffect(() => {
     if (!rooms) return;
     
@@ -128,11 +124,10 @@ const Home: React.FC = () => {
           room.name.toLowerCase().includes(search.toLowerCase()) ||
           room.description.toLowerCase().includes(search.toLowerCase());
         const typeMatch = selectedType === 'all' || room.type.toLowerCase() === selectedType;
-        const priceMatch = room.price >= priceRange[0] && room.price <= priceRange[1];
-        return searchMatch && typeMatch && priceMatch;
+        return searchMatch && typeMatch;
       })
     );
-  }, [rooms, search, selectedType, priceRange]);
+  }, [rooms, search, selectedType]);
 
   const goTo = (idx: number) => {
     setCurrent(idx);
@@ -147,18 +142,26 @@ const Home: React.FC = () => {
     setAutoPlay(false);
   };
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
+  const handleQuickSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Filtering is already handled by useEffect
+    const params = new URLSearchParams();
+
+    if (search.trim()) {
+      params.set('q', search.trim());
+    }
+
+    if (selectedType !== 'all') {
+      params.set('type', selectedType);
+    }
+
+    const query = params.toString();
+    navigate(query ? `/rooms?${query}` : '/rooms');
   };
 
   if (loading) {
     return (
       <div className="home">
-        <Navbar />
-        <main className="main-content">
-          <LoadingSpinner size="large" message="Loading rooms..." />
-        </main>
+        <LoadingSpinner size="large" message="Loading rooms..." />
       </div>
     );
   }
@@ -173,15 +176,16 @@ const Home: React.FC = () => {
         />
       )}
       
-      <Navbar />
-      <main className="main-content">
-        <section className="hero-section">
+      <section className="hero-section">
         <AnimatePresence initial={false}>
           <motion.img
             key={current}
             src={heroImages[current]}
             alt={`Hotel hero ${current + 1}`}
-              className="hero-image"
+            className="hero-image"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
             initial={{ opacity: 0, x: 100 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -100 }}
@@ -240,11 +244,12 @@ const Home: React.FC = () => {
       </section>
 
       {/* Search Bar Section */}
-        <section className="search-section">
-        <form
-            className="search-form"
-          onSubmit={handleSearchSubmit}
-        >
+      <section className="search-section">
+        <form className="search-form" onSubmit={handleQuickSearchSubmit}>
+            <div className="search-intent">
+              <h3>Plan Your Stay</h3>
+              <p>Start with a quick search, then fine-tune filters on the rooms page.</p>
+            </div>
             <div className="search-input-group">
               <input
                 type="text"
@@ -266,15 +271,30 @@ const Home: React.FC = () => {
                 <option value="presidential">Presidential</option>
                 <option value="garden">Garden</option>
               </select>
-              <button type="submit" className="btn-primary search-button">
-                Search
-              </button>
             </div>
-          </form>
-        </section>
+            <div className="search-actions">
+              <button type="submit" className="search-button">Find Rooms</button>
+              <p className="search-meta">{filteredRooms.length} room{filteredRooms.length !== 1 ? 's' : ''} match your quick search</p>
+            </div>
+        </form>
+        <div className="search-trust-row">
+          <div className="trust-item">
+            <strong>4.8/5</strong>
+            <span>Guest Rating</span>
+          </div>
+          <div className="trust-item">
+            <strong>24/7</strong>
+            <span>Concierge Support</span>
+          </div>
+          <div className="trust-item">
+            <strong>Best Rate</strong>
+            <span>Direct Booking Promise</span>
+          </div>
+        </div>
+      </section>
 
         {/* Featured Rooms Section */}
-        <section className="featured-rooms-section">
+      <section className="featured-rooms-section">
           <div className="section-header">
             <h2 className="section-title">Featured Rooms</h2>
             <p className="section-subtitle">Discover our most popular accommodations</p>
@@ -296,7 +316,9 @@ const Home: React.FC = () => {
                           ? room.images[0] 
                           : room.images[0])
                       : '/room1.jpg'} 
-                    alt={room.name} 
+                    alt={room.name}
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
                 <div className="room-info">
@@ -330,8 +352,7 @@ const Home: React.FC = () => {
               </Link>
             </div>
           )}
-        </section>
-      </main>
+      </section>
     </div>
   );
 };

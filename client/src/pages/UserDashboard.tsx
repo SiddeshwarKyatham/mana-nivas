@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
 import ErrorAlert from '../components/shared/ErrorAlert';
+import ConfirmDialog from '../components/shared/ConfirmDialog';
 import { supabase } from '../supabaseClient';
 import './UserDashboard.css';
 
@@ -32,6 +33,7 @@ const UserDashboard: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showError, setShowError] = useState(false);
   const [cancellingBooking, setCancellingBooking] = useState<string | null>(null);
+  const [pendingCancelId, setPendingCancelId] = useState<string | null>(null);
 
   const fetchBookings = async () => {
     if (!user?._id) {
@@ -106,27 +108,26 @@ const UserDashboard: React.FC = () => {
   }, [user]);
 
   const handleCancelBooking = async (bookingId: string) => {
-    if (window.confirm('Are you sure you want to cancel this booking?')) {
-      setCancellingBooking(bookingId);
-      try {
-        const { error: cancelError } = await supabase
-          .from('bookings')
-          .update({ status: 'cancelled' })
-          .eq('id', bookingId)
-          .eq('user_id', user?._id);
+    setCancellingBooking(bookingId);
+    try {
+      const { error: cancelError } = await supabase
+        .from('bookings')
+        .update({ status: 'cancelled' })
+        .eq('id', bookingId)
+        .eq('user_id', user?._id);
 
-        if (cancelError) {
-          throw new Error(cancelError.message || 'Failed to cancel booking');
-        }
-
-        await fetchBookings();
-      } catch (err: any) {
-        setError(err?.message || 'Error cancelling booking');
-        setShowError(true);
-        console.error('Error cancelling booking:', err);
-      } finally {
-        setCancellingBooking(null);
+      if (cancelError) {
+        throw new Error(cancelError.message || 'Failed to cancel booking');
       }
+
+      await fetchBookings();
+    } catch (err: any) {
+      setError(err?.message || 'Error cancelling booking');
+      setShowError(true);
+      console.error('Error cancelling booking:', err);
+    } finally {
+      setCancellingBooking(null);
+      setPendingCancelId(null);
     }
   };
 
@@ -138,14 +139,14 @@ const UserDashboard: React.FC = () => {
     });
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusClass = (status: string) => {
     switch (status) {
       case 'booked':
-        return 'text-green-600';
+        return 'booked';
       case 'cancelled':
-        return 'text-red-600';
+        return 'cancelled';
       default:
-        return 'text-yellow-600';
+        return 'pending';
     }
   };
 
@@ -159,6 +160,9 @@ const UserDashboard: React.FC = () => {
         return 'Pending';
     }
   };
+
+  const activeBookings = bookings.filter((booking) => booking.status === 'booked').length;
+  const cancelledBookings = bookings.filter((booking) => booking.status === 'cancelled').length;
 
   if (loading) {
     return (
@@ -181,17 +185,30 @@ const UserDashboard: React.FC = () => {
       <div className="dashboard-header">
         <h1>Welcome back, {user?.name}!</h1>
         <p>Manage your bookings and profile</p>
+        <div className="dashboard-stats">
+          <div className="stat-chip">
+            <span className="stat-label">Total</span>
+            <span className="stat-value">{bookings.length}</span>
+          </div>
+          <div className="stat-chip">
+            <span className="stat-label">Active</span>
+            <span className="stat-value">{activeBookings}</span>
+          </div>
+          <div className="stat-chip">
+            <span className="stat-label">Cancelled</span>
+            <span className="stat-value">{cancelledBookings}</span>
+          </div>
+        </div>
       </div>
 
       <div className="dashboard-content">
         {/* My Bookings Section */}
         <section className="bookings-section">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h2>My Bookings</h2>
+          <div className="bookings-header">
+            <h2 className="bookings-title">My Bookings</h2>
             <button 
               onClick={() => fetchBookings()} 
-              className="btn-primary"
-              style={{ padding: '8px 16px', fontSize: '14px' }}
+              className="refresh-button"
             >
               Refresh Bookings
             </button>
@@ -202,7 +219,7 @@ const UserDashboard: React.FC = () => {
                 <div key={booking._id} className="booking-card">
                   <div className="booking-header">
                     <h3>{booking.room.name}</h3>
-                    <span className={`status ${getStatusColor(booking.status)}`}>
+                    <span className={`booking-status ${getStatusClass(booking.status)}`}>
                       {getStatusText(booking.status)}
                     </span>
                   </div>
@@ -221,7 +238,7 @@ const UserDashboard: React.FC = () => {
                     </div>
                     <div className="detail-item">
                       <span className="label">Price:</span>
-                      <span className="value">${booking.room.price}/night</span>
+                      <span className="value">${booking.room.price.toLocaleString()}/night</span>
                     </div>
                   </div>
                   <div className="booking-actions">
@@ -230,12 +247,11 @@ const UserDashboard: React.FC = () => {
                         <button
                           onClick={() => navigate(`/edit-booking/${booking._id}`)}
                           className="btn-primary"
-                          style={{ marginRight: '10px' }}
                         >
                           Edit Booking
                         </button>
                         <button
-                          onClick={() => handleCancelBooking(booking._id)}
+                          onClick={() => setPendingCancelId(booking._id)}
                           disabled={cancellingBooking === booking._id}
                           className="btn-danger"
                         >
@@ -250,7 +266,7 @@ const UserDashboard: React.FC = () => {
           ) : (
             <div className="no-bookings">
               <p>You don't have any bookings yet.</p>
-              <a href="/rooms" className="btn-primary">Browse Rooms</a>
+              <Link to="/rooms" className="btn-primary">Browse Rooms</Link>
             </div>
           )}
         </section>
@@ -259,21 +275,36 @@ const UserDashboard: React.FC = () => {
         <section className="quick-actions">
           <h2>Quick Actions</h2>
           <div className="actions-grid">
-            <a href="/rooms" className="action-card">
+            <Link to="/rooms" className="action-card">
               <h3>Book a Room</h3>
               <p>Find and book your perfect accommodation</p>
-            </a>
-            <a href="/contact" className="action-card">
+            </Link>
+            <Link to="/contact" className="action-card">
               <h3>Contact Support</h3>
               <p>Get help with your bookings</p>
-            </a>
-            <a href="/about" className="action-card">
+            </Link>
+            <Link to="/about" className="action-card">
               <h3>Hotel Information</h3>
               <p>Learn more about our amenities</p>
-            </a>
+            </Link>
           </div>
         </section>
       </div>
+      <ConfirmDialog
+        open={Boolean(pendingCancelId)}
+        title="Cancel booking?"
+        message="This updates booking status to cancelled and keeps your history."
+        confirmLabel="Cancel booking"
+        cancelLabel="Keep booking"
+        danger
+        busy={Boolean(cancellingBooking)}
+        onCancel={() => setPendingCancelId(null)}
+        onConfirm={() => {
+          if (pendingCancelId) {
+            handleCancelBooking(pendingCancelId);
+          }
+        }}
+      />
     </div>
   );
 };

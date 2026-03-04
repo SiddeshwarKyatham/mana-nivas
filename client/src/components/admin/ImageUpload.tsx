@@ -2,6 +2,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { FaUpload, FaTrash } from 'react-icons/fa';
 import { supabase } from '../../supabaseClient';
+import ConfirmDialog from '../shared/ConfirmDialog';
 import './ImageUpload.css';
 
 interface ImageUploadProps {
@@ -20,6 +21,8 @@ const getFilePathFromPublicUrl = (url: string): string | null => {
 const ImageUpload: React.FC<ImageUploadProps> = ({ roomId, currentImages, onImagesUpdated }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
+  const [pendingDeleteIndex, setPendingDeleteIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const updateRoomImages = async (images: string[]) => {
@@ -35,6 +38,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ roomId, currentImages, onImag
     if (imageFiles.length === 0) return;
 
     setUploading(true);
+    setError('');
     try {
       const uploadedUrls: string[] = [];
 
@@ -56,6 +60,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ roomId, currentImages, onImag
       }
 
       await updateRoomImages([...(currentImages || []), ...uploadedUrls]);
+    } catch (err: any) {
+      setError(err?.message || 'Upload failed');
+      throw err;
     } finally {
       setUploading(false);
     }
@@ -93,8 +100,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ roomId, currentImages, onImag
   };
 
   const handleDeleteImage = async (imageIndex: number) => {
-    if (!window.confirm('Are you sure you want to delete this image?')) return;
-
     try {
       const imageUrl = currentImages[imageIndex];
       const path = getFilePathFromPublicUrl(imageUrl);
@@ -104,14 +109,17 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ roomId, currentImages, onImag
 
       const updated = currentImages.filter((_, index) => index !== imageIndex);
       await updateRoomImages(updated);
-    } catch (error) {
-      console.error('Delete failed:', error);
+      setPendingDeleteIndex(null);
+    } catch (err: any) {
+      setError(err?.message || 'Delete failed');
+      console.error('Delete failed:', err);
     }
   };
 
   return (
     <div className="image-upload-container">
       <h4>Room Images</h4>
+      {error && <p className="upload-error">{error}</p>}
       <div className="current-images">
         {currentImages.map((image, index) => (
           <motion.div
@@ -125,7 +133,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ roomId, currentImages, onImag
             <button
               type="button"
               className="delete-image-btn"
-              onClick={() => handleDeleteImage(index)}
+              onClick={() => setPendingDeleteIndex(index)}
               title="Delete image"
             >
               <FaTrash />
@@ -147,7 +155,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ roomId, currentImages, onImag
           multiple
           accept="image/*"
           onChange={handleFileSelect}
-          style={{ display: 'none' }}
+          className="upload-input-hidden"
         />
 
         <div className="upload-content">
@@ -163,6 +171,20 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ roomId, currentImages, onImag
           </div>
         )}
       </div>
+      <ConfirmDialog
+        open={pendingDeleteIndex !== null}
+        title="Delete image?"
+        message="This removes the image from storage and from the room gallery."
+        confirmLabel="Delete image"
+        cancelLabel="Cancel"
+        danger
+        onCancel={() => setPendingDeleteIndex(null)}
+        onConfirm={() => {
+          if (pendingDeleteIndex !== null) {
+            handleDeleteImage(pendingDeleteIndex);
+          }
+        }}
+      />
     </div>
   );
 };

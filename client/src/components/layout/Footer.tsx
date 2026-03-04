@@ -37,8 +37,8 @@ const Footer = () => {
           <h4>Quick Links</h4>
           <Link to="/">Home</Link>
           <Link to="/rooms">Rooms</Link>
-          <Link to="/Dining">Dining</Link>
-          <Link to="/Spa">Spa</Link>
+          <Link to="/dining">Dining</Link>
+          <Link to="/spa">Spa</Link>
           <Link to="/about">About</Link>
           <Link to="/contact">Contact</Link>
         </div>
@@ -48,7 +48,7 @@ const Footer = () => {
           <Link to="/privacy">Privacy Policy</Link>
           <Link to="/terms">Terms of Service</Link>
           <Link to="/cookies">Cookie Policy</Link>
-          <Link to="/accessibility">Accessibility</Link>
+          <Link to="/contact">Accessibility Support</Link>
         </div>
 
         <div className="footer-section">

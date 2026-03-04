@@ -38,6 +38,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: authLogoFloat 6s ease-in-out infinite;
 }
 
 .auth-logo img {
@@ -86,6 +87,21 @@
   border-radius: var(--border-radius-xl);
   box-shadow: var(--shadow-soft);
   border: 1px solid var(--border-light);
+  position: relative;
+  overflow: hidden;
+  animation: authCardRise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.auth-form::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, rgba(196, 155, 59, 0.25) 25%, rgba(196, 155, 59, 0.9) 50%, rgba(196, 155, 59, 0.25) 75%, transparent 100%);
+  transform: translateX(-40%);
+  animation: authShimmer 3.8s ease-in-out infinite;
 }
 
 .auth-form h2 {
@@ -104,6 +120,11 @@
   margin-bottom: var(--spacing-lg);
   font-size: 0.875rem;
   line-height: 1.5;
+}
+
+.auth-error-wrap {
+  margin-top: calc(var(--spacing-sm) * -1);
+  margin-bottom: var(--spacing-sm);
 }
 
 .form-group {
@@ -135,6 +156,7 @@
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.1);
+  transform: translateY(-1px);
 }
 
 .auth-input:disabled {
@@ -224,15 +246,53 @@
   color: var(--secondary-color);
 }
 
-.error-message {
-  background: rgba(220, 53, 69, 0.1);
-  color: var(--error-color);
-  padding: var(--spacing-md);
+.auth-inline-error {
+  border: 1px solid #f7caca;
+  background: #fff4f4;
+  color: #9f2f2f;
   border-radius: var(--border-radius-md);
-  font-size: 0.875rem;
-  border: 1px solid rgba(220, 53, 69, 0.2);
-  margin-top: var(--spacing-sm);
-  line-height: 1.5;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+@keyframes authLogoFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes authCardRise {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes authShimmer {
+  0% {
+    transform: translateX(-40%);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  70% {
+    transform: translateX(40%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(70%);
+    opacity: 0;
+  }
 }
 
 /* Responsive Design */

@@ -10,9 +10,9 @@ const About = () => {
   return (
     <div className="about-page">
       {/* Hero Section */}
-      <section className="about-hero" style={{ marginTop: '80px' }}>
+      <section className="about-hero">
         <div className="about-hero-image">
-          <img src={aboutHero} alt="MANA NIVAS Hotel Exterior" />
+          <img src={aboutHero} alt="MANA NIVAS Hotel Exterior" loading="eager" fetchPriority="high" decoding="async" />
         </div>
         <div className="about-hero-content">
           <h1 className="about-hero-headline">Our Story</h1>
@@ -24,7 +24,7 @@ const About = () => {
       <section className="about-section">
         <div className="about-content">
           <div className="about-image">
-            <img src={aboutHistory} alt="MANA NIVAS History" />
+            <img src={aboutHistory} alt="MANA NIVAS History" loading="lazy" decoding="async" />
           </div>
           <div className="about-text">
             <h2>Our History</h2>
@@ -43,7 +43,7 @@ const About = () => {
             <p>We believe in continuous training and development to maintain the highest standards of service excellence.</p>
           </div>
           <div className="about-image">
-            <img src={aboutTeam} alt="MANA NIVAS Team" />
+            <img src={aboutTeam} alt="MANA NIVAS Team" loading="lazy" decoding="async" />
           </div>
         </div>
       </section>
@@ -52,7 +52,7 @@ const About = () => {
       <section className="about-section">
         <div className="about-content">
           <div className="about-image">
-            <img src={aboutAmenities} alt="MANA NIVAS Amenities" />
+            <img src={aboutAmenities} alt="MANA NIVAS Amenities" loading="lazy" decoding="async" />
           </div>
           <div className="about-text">
             <h2>World-Class Amenities</h2>
@@ -90,7 +90,7 @@ const About = () => {
             </div>
           </div>
           <div className="about-image">
-            <img src={aboutAwards} alt="MANA NIVAS Awards" />
+            <img src={aboutAwards} alt="MANA NIVAS Awards" loading="lazy" decoding="async" />
           </div>
         </div>
       </section>
