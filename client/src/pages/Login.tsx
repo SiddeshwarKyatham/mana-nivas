@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import LoadingSpinner from '../components/shared/LoadingSpinner';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import LogoLoader from '../components/shared/LogoLoader';
 import ErrorAlert from '../components/shared/ErrorAlert';
-import { supabase } from '../supabaseClient';
+import { api } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
 import './auth.css';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
+  // Where to go after login — default /dashboard
+  const from = (location.state as any)?.from || '/dashboard';
+  // Flag set by Register page
+  const justRegistered = (location.state as any)?.registered === true;
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -24,16 +32,13 @@ const Login: React.FC = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const response = await api.post('/auth/login', {
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
       });
 
-      if (error) {
-        throw new Error(error.message || 'Login failed. Please try again.');
-      }
-
-      navigate('/');
+      login(response.token, response.user);
+      navigate(from, { replace: true });
     } catch (err: any) {
       setErrorMessage(err?.message || 'Login failed. Please try again.');
       setShowError(true);
@@ -81,50 +86,72 @@ const Login: React.FC = () => {
       </div>
 
       <div className="auth-right">
-        <motion.form
-          className="auth-form"
-          onSubmit={handleSubmit}
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-        >
-          <h2>Welcome Back</h2>
-          <p className="auth-subtitle">Sign in to your account</p>
+        <AnimatePresence mode="wait">
+          {loading ? (
+            <motion.div
+              key="loader"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.05 }}
+              transition={{ duration: 0.4 }}
+              className="auth-form loading-state"
+            >
+              <LogoLoader message="Authenticating..." />
+            </motion.div>
+          ) : (
+            <motion.form
+              key="form"
+              className="auth-form"
+              onSubmit={handleSubmit}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <h2>Welcome Back</h2>
+              <p className="auth-subtitle">Sign in to your account</p>
+
+          {justRegistered && (
+            <div className="auth-success-wrap">
+              <div className="auth-success-alert">✓ Account created successfully! Please sign in.</div>
+            </div>
+          )}
+
           {showError && errorMessage && (
             <div className="auth-error-wrap">
               <ErrorAlert message={errorMessage} onClose={() => setShowError(false)} type="error" />
             </div>
           )}
 
-          <div className="form-group">
-            <label htmlFor="email" className="form-label">Email Address</label>
+          <div className="form-group floating">
             <input
-              className="auth-input input-primary"
+              className="floating-input"
               type="email"
               id="email"
               name="email"
-              placeholder="Enter your email"
+              placeholder=" "
               value={formData.email}
               onChange={handleChange}
               required
               disabled={loading}
             />
+            <label htmlFor="email" className="floating-label">Email Address</label>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password" className="form-label">Password</label>
+          <div className="form-group floating">
             <div className="password-input-container">
               <input
-                className="auth-input input-primary"
+                className="floating-input"
                 type={showPassword ? 'text' : 'password'}
                 id="password"
                 name="password"
-                placeholder="Enter your password"
+                placeholder=" "
                 value={formData.password}
                 onChange={handleChange}
                 required
                 disabled={loading}
               />
+              <label htmlFor="password" className="floating-label">Password</label>
               <button
                 type="button"
                 className="password-toggle"
@@ -138,14 +165,16 @@ const Login: React.FC = () => {
           </div>
 
           <button className="auth-button btn-primary" type="submit" disabled={loading}>
-            {loading ? <LoadingSpinner size="small" message="" /> : 'Sign In'}
+            Sign In
           </button>
 
           <div className="auth-switch">
             Don't have an account?
             <Link to="/register" className="auth-link">Create Account</Link>
           </div>
-        </motion.form>
+            </motion.form>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

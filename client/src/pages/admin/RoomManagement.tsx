@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { supabase } from '../../supabaseClient';
+import { motion, AnimatePresence } from 'framer-motion';
+import { api } from '../../lib/api';
 import { Room, toRoom } from '../../types/supabase';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import ErrorAlert from '../../components/shared/ErrorAlert';
-import ConfirmDialog from '../../components/shared/ConfirmDialog';
 import ImageUpload from '../../components/admin/ImageUpload';
 import './RoomManagement.css';
 
@@ -35,15 +34,13 @@ const RoomManagement: React.FC = () => {
   const [newAmenity, setNewAmenity] = useState('');
   const [showError, setShowError] = useState(false);
   const [pendingDeleteRoomId, setPendingDeleteRoomId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const fetchRooms = async () => {
     setLoading(true);
     setError('');
     try {
-      const { data, error: fetchError } = await supabase.from('rooms').select('*').order('created_at', { ascending: false });
-      if (fetchError) {
-        throw new Error(fetchError.message || 'Failed to fetch rooms');
-      }
+      const data = await api.get('/rooms');
       setRooms((data || []).map((row: any) => toRoom(row)));
     } catch (err: any) {
       const message = err?.message || 'Failed to load rooms';
@@ -102,30 +99,16 @@ const RoomManagement: React.FC = () => {
     setError('');
     try {
       if (isEditing && selectedRoom) {
-        const { error: updateError } = await supabase
-          .from('rooms')
-          .update({
-            ...formData,
-            status: 'active',
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', selectedRoom.id);
-
-        if (updateError) {
-          throw new Error(updateError.message || 'Failed to update room');
-        }
+        await api.put(`/rooms/${selectedRoom.id}`, {
+          ...formData,
+          status: 'active',
+        });
       } else {
-        const { error: insertError } = await supabase.from('rooms').insert([
-          {
-            ...formData,
-            images: [],
-            status: 'active',
-          },
-        ]);
-
-        if (insertError) {
-          throw new Error(insertError.message || 'Failed to create room');
-        }
+        await api.post('/rooms', {
+          ...formData,
+          images: [],
+          status: 'active',
+        });
       }
 
       await fetchRooms();
@@ -151,16 +134,16 @@ const RoomManagement: React.FC = () => {
   };
 
   const handleDelete = async (roomId: string) => {
+    setDeletingId(roomId);
     try {
-      const { error: deleteError } = await supabase.from('rooms').delete().eq('id', roomId);
-      if (deleteError) {
-        throw new Error(deleteError.message || 'Failed to delete room');
-      }
-      await fetchRooms();
+      await api.delete(`/rooms/${roomId}`);
+      // Animate out then remove
+      setRooms((prev) => prev.filter((r) => r.id !== roomId));
     } catch (err: any) {
       setError(err?.message || 'Error deleting room');
       setShowError(true);
     } finally {
+      setDeletingId(null);
       setPendingDeleteRoomId(null);
     }
   };
@@ -181,12 +164,12 @@ const RoomManagement: React.FC = () => {
     <div className="room-management">
       {showError && error && <ErrorAlert message={error} onClose={() => setShowError(false)} type="error" />}
 
-      <div className="room-management-header">
-        <h1>Room Management</h1>
-        <p>Manage your hotel rooms and their details</p>
-        <button className="btn btn-primary" onClick={() => setShowForm(true)}>
-          Add New Room
-        </button>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
+        {!showForm && (
+          <button className="btn btn-primary" onClick={() => setShowForm(true)}>
+            + Add New Room
+          </button>
+        )}
       </div>
 
       {showForm && (
@@ -265,8 +248,16 @@ const RoomManagement: React.FC = () => {
       )}
 
       <div className="rooms-grid">
+        <AnimatePresence>
         {rooms.map((room) => (
-          <motion.div key={room.id} className="room-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <motion.div
+            key={room.id}
+            className="room-card"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+            layout
+          >
             <div className="room-images">
               {room.images.length > 0 ? <img src={room.images[0]} alt={room.name} /> : <div className="no-image">No Image</div>}
             </div>
@@ -274,7 +265,7 @@ const RoomManagement: React.FC = () => {
             <div className="room-info">
               <h3>{room.name}</h3>
               <p className="room-type">{room.type}</p>
-              <p className="room-price">${room.price}/night</p>
+              <p className="room-price">₹{room.price}/night</p>
               <p className="room-capacity">Capacity: {room.capacity || 1}</p>
 
               <div className="room-amenities">
@@ -284,10 +275,41 @@ const RoomManagement: React.FC = () => {
                 {room.amenities.length > 3 && <span className="amenity-tag">+{room.amenities.length - 3} more</span>}
               </div>
 
-              <div className="room-actions">
-                <button onClick={() => handleEdit(room)} className="btn btn-secondary">Edit</button>
-                <button onClick={() => setPendingDeleteRoomId(room.id)} className="btn btn-danger">Delete</button>
-              </div>
+              {/* Inline Delete Confirmation */}
+              <AnimatePresence mode="wait">
+                {pendingDeleteRoomId === room.id ? (
+                  <motion.div
+                    key="confirm"
+                    className="inline-delete-confirm"
+                    initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                    transition={{ duration: 0.18 }}
+                  >
+                    <p>⚠️ Delete <strong>{room.name}</strong>? This cannot be undone.</p>
+                    <div className="inline-delete-actions">
+                      <button
+                        className="btn btn-danger"
+                        disabled={deletingId === room.id}
+                        onClick={() => handleDelete(room.id)}
+                      >
+                        {deletingId === room.id ? 'Deleting…' : 'Yes, Delete'}
+                      </button>
+                      <button
+                        className="btn btn-secondary"
+                        onClick={() => setPendingDeleteRoomId(null)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div key="actions" className="room-actions" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                    <button onClick={() => handleEdit(room)} className="btn btn-secondary">Edit</button>
+                    <button onClick={() => setPendingDeleteRoomId(room.id)} className="btn btn-danger">Delete</button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               <ImageUpload
                 roomId={room.id}
@@ -297,21 +319,9 @@ const RoomManagement: React.FC = () => {
             </div>
           </motion.div>
         ))}
+        </AnimatePresence>
       </div>
-      <ConfirmDialog
-        open={Boolean(pendingDeleteRoomId)}
-        title="Delete room?"
-        message="This permanently removes the room record. Existing bookings may lose room references."
-        confirmLabel="Delete room"
-        cancelLabel="Cancel"
-        danger
-        onCancel={() => setPendingDeleteRoomId(null)}
-        onConfirm={() => {
-          if (pendingDeleteRoomId) {
-            handleDelete(pendingDeleteRoomId);
-          }
-        }}
-      />
+
     </div>
   );
 };

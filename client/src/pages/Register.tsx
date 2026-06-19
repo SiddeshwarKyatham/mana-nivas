@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import LoadingSpinner from '../components/shared/LoadingSpinner';
+import { motion, AnimatePresence } from 'framer-motion';
+import LogoLoader from '../components/shared/LogoLoader';
 import ErrorAlert from '../components/shared/ErrorAlert';
-import { supabase } from '../supabaseClient';
+import { api } from '../lib/api';
 import './auth.css';
 
 const Register: React.FC = () => {
@@ -47,27 +47,14 @@ const Register: React.FC = () => {
     try {
       setLoading(true);
 
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      await api.post('/auth/register', {
+        name: formData.name,
+        phone: formData.phone,
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
-        options: {
-          data: {
-            full_name: formData.name,
-            phone: formData.phone,
-          },
-        },
       });
 
-      if (signUpError) {
-        throw new Error(signUpError.message || 'Signup failed. Please try again.');
-      }
-
-      const user = signUpData.user;
-      if (!user) {
-        throw new Error('Signup completed but no user was returned. Please try logging in.');
-      }
-
-      navigate('/login');
+      navigate('/login', { state: { registered: true } });
     } catch (err: any) {
       setErrorMessage(err?.message || 'Registration failed. Please try again.');
       setShowError(true);
@@ -119,129 +106,150 @@ const Register: React.FC = () => {
       </div>
 
       <div className="auth-right">
-        <motion.form
-          className="auth-form"
-          onSubmit={handleSubmit}
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-        >
-          <h2>Create Account</h2>
-          <p className="auth-subtitle">Join us for an amazing experience</p>
+        <AnimatePresence mode="wait">
+          {loading ? (
+            <motion.div
+              key="loader"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.05 }}
+              transition={{ duration: 0.4 }}
+              className="auth-form loading-state"
+            >
+              <LogoLoader message="Creating Account..." />
+            </motion.div>
+          ) : (
+            <motion.form
+              key="form"
+              className="auth-form"
+              onSubmit={handleSubmit}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <h2>Create Account</h2>
+              <p className="auth-subtitle">Join us for an amazing experience</p>
           {showError && errorMessage && (
             <div className="auth-error-wrap">
               <ErrorAlert message={errorMessage} onClose={() => setShowError(false)} type="error" />
             </div>
           )}
 
-          <div className="form-group">
-            <label htmlFor="name" className="form-label">Full Name</label>
-            <input
-              className="auth-input input-primary"
-              type="text"
-              id="name"
-              name="name"
-              placeholder="Enter your full name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              disabled={loading}
-            />
+          <div className="auth-form-row">
+            <div className="form-group floating">
+              <input
+                className="floating-input"
+                type="text"
+                id="name"
+                name="name"
+                placeholder=" "
+                value={formData.name}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              />
+              <label htmlFor="name" className="floating-label">Full Name</label>
+            </div>
+            
+            <div className="form-group floating">
+              <input
+                className="floating-input"
+                type="tel"
+                id="phone"
+                name="phone"
+                placeholder=" "
+                value={formData.phone}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              />
+              <label htmlFor="phone" className="floating-label">Phone Number</label>
+            </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="email" className="form-label">Email Address</label>
+          <div className="form-group floating">
             <input
-              className="auth-input input-primary"
+              className="floating-input"
               type="email"
               id="email"
               name="email"
-              placeholder="Enter your email"
+              placeholder=" "
               value={formData.email}
               onChange={handleChange}
               required
               disabled={loading}
             />
+            <label htmlFor="email" className="floating-label">Email Address</label>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="phone" className="form-label">Phone</label>
-            <input
-              className="auth-input input-primary"
-              type="tel"
-              id="phone"
-              name="phone"
-              placeholder="Enter your phone number"
-              value={formData.phone}
-              onChange={handleChange}
-              required
-              disabled={loading}
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password" className="form-label">Password</label>
-            <div className="password-input-container">
-              <input
-                className="auth-input input-primary"
-                type={showPassword ? 'text' : 'password'}
-                id="password"
-                name="password"
-                placeholder="Create a password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                disabled={loading}
-              />
-              <button
-                type="button"
-                className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-                disabled={loading}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? 'Hide' : 'Show'}
-              </button>
+          <div className="auth-form-row">
+            <div className="form-group floating">
+              <div className="password-input-container">
+                <input
+                  className="floating-input"
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  name="password"
+                  placeholder=" "
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  disabled={loading}
+                />
+                <label htmlFor="password" className="floating-label">Password</label>
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={loading}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="form-group">
-            <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
-            <div className="password-input-container">
-              <input
-                className="auth-input input-primary"
-                type={showConfirmPassword ? 'text' : 'password'}
-                id="confirmPassword"
-                name="confirmPassword"
-                placeholder="Confirm your password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-                disabled={loading}
-              />
-              <button
-                type="button"
-                className="password-toggle"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                disabled={loading}
-                aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
-              >
-                {showConfirmPassword ? 'Hide' : 'Show'}
-              </button>
+            <div className="form-group floating">
+              <div className="password-input-container">
+                <input
+                  className="floating-input"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  placeholder=" "
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  required
+                  disabled={loading}
+                />
+                <label htmlFor="confirmPassword" className="floating-label">Confirm Password</label>
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  disabled={loading}
+                  aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                >
+                  {showConfirmPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
             </div>
           </div>
 
           {passwordError && <div className="auth-inline-error">{passwordError}</div>}
 
           <button className="auth-button btn-primary" type="submit" disabled={loading}>
-            {loading ? <LoadingSpinner size="small" message="" /> : 'Create Account'}
+            Create Account
           </button>
 
           <div className="auth-switch">
             Already have an account?
             <Link to="/login" className="auth-link">Sign In</Link>
           </div>
-        </motion.form>
+            </motion.form>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

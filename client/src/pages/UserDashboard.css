@@ -12,14 +12,14 @@
 }
 
 .dashboard-header h1 {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-display);
   font-size: clamp(2.1rem, 4.2vw, 3rem);
   color: var(--charcoal);
   margin: 0 0 0.75rem;
 }
 
 .dashboard-header p {
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-primary);
   font-size: 1.05rem;
   color: var(--text-muted);
   margin: 0;
@@ -65,7 +65,7 @@
 }
 
 .dashboard-title {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-display);
   font-size: clamp(2.5rem, 5vw, 3.5rem);
   color: var(--charcoal);
   margin-bottom: 1rem;
@@ -86,7 +86,7 @@
 }
 
 .dashboard-subtitle {
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-primary);
   font-size: 1.2rem;
   color: var(--text-muted);
   max-width: 600px;
@@ -112,14 +112,14 @@
 }
 
 .welcome-message {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-display);
   font-size: 1.8rem;
   color: var(--charcoal);
   margin-bottom: 1rem;
 }
 
 .welcome-subtitle {
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-primary);
   font-size: 1.1rem;
   color: var(--text-muted);
   margin-bottom: 1.5rem;
@@ -142,7 +142,7 @@
   align-items: center;
   justify-content: center;
   color: var(--charcoal);
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-display);
   font-size: 1.5rem;
   font-weight: 700;
 }
@@ -152,7 +152,7 @@
 }
 
 .user-name {
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-primary);
   font-weight: 600;
   color: var(--charcoal);
   font-size: 1.1rem;
@@ -160,7 +160,7 @@
 }
 
 .user-email {
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-primary);
   color: var(--text-muted);
   font-size: 0.9rem;
 }
@@ -186,7 +186,7 @@
 }
 
 .bookings-title {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-display);
   font-size: 1.8rem;
   color: var(--charcoal);
   margin: 0;
@@ -198,7 +198,7 @@
   color: var(--charcoal);
   border: none;
   border-radius: 1rem;
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-primary);
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
@@ -258,13 +258,13 @@
 
 .booking-header h3 {
   margin: 0;
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-display);
   font-size: 1.2rem;
   color: var(--charcoal);
 }
 
 .booking-id {
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-primary);
   font-size: 0.8rem;
   color: var(--text-muted);
   background: rgba(196, 155, 59, 0.1);
@@ -274,7 +274,7 @@
 }
 
 .booking-status {
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-primary);
   font-size: 0.8rem;
   font-weight: 600;
   padding: 0.25rem 0.75rem;
@@ -330,7 +330,7 @@
 }
 
 .room-name {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-display);
   font-size: 1.3rem;
   color: var(--charcoal);
   margin-bottom: 0.5rem;
@@ -338,7 +338,7 @@
 }
 
 .room-type {
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-primary);
   font-size: 0.9rem;
   color: var(--gold);
   text-transform: uppercase;
@@ -361,7 +361,7 @@
 }
 
 .date-label {
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-primary);
   font-size: 0.8rem;
   color: var(--text-muted);
   font-weight: 600;
@@ -370,14 +370,14 @@
 }
 
 .date-value {
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-primary);
   font-size: 0.9rem;
   color: var(--charcoal);
   font-weight: 500;
 }
 
 .booking-price {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-display);
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--gold);
@@ -396,7 +396,7 @@
   color: var(--charcoal);
   border: none;
   border-radius: 1rem;
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-primary);
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
@@ -418,7 +418,7 @@
   color: var(--white);
   border: none;
   border-radius: 1rem;
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-primary);
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
@@ -477,7 +477,7 @@
 
 .quick-actions h2 {
   margin: 0 0 1.3rem;
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-display);
   font-size: 1.6rem;
   color: var(--charcoal);
 }
@@ -540,14 +540,14 @@
 }
 
 .empty-title {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-display);
   font-size: 1.5rem;
   color: var(--charcoal);
   margin-bottom: 1rem;
 }
 
 .empty-message {
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-primary);
   font-size: 1.1rem;
   color: var(--text-muted);
   margin-bottom: 2rem;
@@ -711,6 +711,99 @@
     padding: 2rem 1rem;
   }
   
+  .bookings-title {
+    font-size: 1.5rem;
+  }
+  
+  .bookings-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .booking-card {
+    padding: 1rem;
+  }
+  
+  .booking-actions {
+    flex-direction: column;
+  }
+  
+  .user-info {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .user-details {
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-dashboard {
+    padding: 1rem 0;
+  }
+  
+  .dashboard-header {
+    padding: 0 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .dashboard-title {
+    font-size: clamp(1.8rem, 3.5vw, 2.2rem);
+  }
+  
+  .dashboard-subtitle {
+    font-size: 1rem;
+  }
+  
+  .dashboard-container {
+    padding: 0 0.5rem;
+  }
+
+  .dashboard-content {
+    padding: 0 0.5rem;
+  }
+  
+  .welcome-section,
+  .bookings-section {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .quick-actions {
+    padding: 1rem;
+  }
+  
+  .welcome-message {
+    font-size: 1.3rem;
+  }
+  
+  .bookings-title {
+    font-size: 1.3rem;
+  }
+  
+  .booking-card {
+    padding: 1rem;
+  }
+  
+  .room-name {
+    font-size: 1.1rem;
+  }
+  
+  .booking-price {
+    font-size: 1.25rem;
+  }
+  
+  .booking-actions .btn-primary,
+  .booking-actions .btn-danger {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.8rem;
+  }
+  
+  .empty-bookings {
+    padding: 2rem 1rem;
+  }
+  
   .empty-icon {
     font-size: 3rem;
   }
@@ -722,4 +815,452 @@
   .empty-message {
     font-size: 1rem;
   }
-} 
+}
+
+/* Timeline Cards Styling */
+.booking-timeline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1.75rem 0 1rem 0;
+  position: relative;
+  padding: 0 0.5rem;
+}
+
+.timeline-point {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+  background: transparent;
+}
+
+.timeline-date {
+  font-family: var(--font-primary);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--charcoal);
+  background: var(--white);
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(196, 155, 59, 0.15);
+  box-shadow: var(--shadow-soft);
+}
+
+.timeline-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  margin-top: 0.35rem;
+  font-weight: 700;
+}
+
+.timeline-line {
+  position: absolute;
+  top: 12px;
+  left: 15%;
+  right: 15%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold) 0%, rgba(196, 155, 59, 0.2) 100%);
+  z-index: 1;
+}
+
+@media (max-width: 480px) {
+  .booking-timeline {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 0;
+  }
+  .timeline-line {
+    display: none;
+  }
+  .timeline-point {
+    align-items: flex-start;
+  }
+  .timeline-date {
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+  }
+}
+
+/* Dashboard Tabs Navigation */
+.dashboard-tabs-container {
+  max-width: 1400px;
+  margin: 0 auto 2.5rem;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.dashboard-tabs {
+  display: inline-flex;
+  background: var(--white);
+  padding: 0.4rem;
+  border-radius: 1.25rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(196, 155, 59, 0.15);
+  gap: 0.5rem;
+}
+
+.dashboard-tab-btn {
+  padding: 0.75rem 1.75rem;
+  font-family: var(--font-primary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-radius: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dashboard-tab-btn:hover {
+  color: var(--charcoal);
+  background: rgba(196, 155, 59, 0.05);
+}
+
+.dashboard-tab-btn.active {
+  color: var(--charcoal);
+  background: linear-gradient(135deg, var(--gold) 0%, #d4af37 100%);
+  box-shadow: 0 4px 15px rgba(196, 155, 59, 0.25);
+}
+
+.dashboard-tab-btn .tab-icon {
+  font-size: 1.1rem;
+}
+
+/* User Profile Modal Overlay */
+.profile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100000;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: modalFadeIn 0.3s ease-out both;
+}
+
+.profile-modal {
+  background: var(--white);
+  border-radius: 2rem;
+  padding: 2.5rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(196, 155, 59, 0.25);
+  max-width: 650px;
+  width: 100%;
+  position: relative;
+  animation: modalSlideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.profile-modal-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(196, 155, 59, 0.2);
+  background: rgba(196, 155, 59, 0.05);
+  color: var(--charcoal);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+}
+
+.profile-modal-close:hover {
+  background: var(--gold);
+  color: var(--white);
+  border-color: var(--gold);
+  transform: rotate(90deg);
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.profile-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px dashed rgba(196, 155, 59, 0.25);
+}
+
+.profile-avatar {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, var(--gold), #d4af37);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--charcoal);
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(196, 155, 59, 0.2);
+}
+
+.profile-meta h2 {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--charcoal);
+  margin: 0 0 0.35rem;
+}
+
+.profile-meta p {
+  font-family: var(--font-primary);
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.profile-error-alert {
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  margin-bottom: 1.5rem;
+  font-family: var(--font-primary);
+  font-size: 0.9rem;
+}
+
+.profile-success-alert {
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  border: 1px solid rgba(40, 167, 69, 0.2);
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  margin-bottom: 1.5rem;
+  font-family: var(--font-primary);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: dashboardLiftIn 0.3s ease-out;
+}
+
+.profile-success-alert .success-icon {
+  font-weight: bold;
+}
+
+.profile-loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem 0;
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.profile-form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-family: var(--font-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--charcoal);
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  background: rgba(196, 155, 59, 0.03);
+  border: 1px solid rgba(196, 155, 59, 0.2);
+  border-radius: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.input-container:focus-within {
+  border-color: var(--gold);
+  background: var(--white);
+  box-shadow: 0 0 0 4px rgba(196, 155, 59, 0.15);
+}
+
+.input-container.disabled {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+  cursor: not-allowed;
+}
+
+.input-field-icon {
+  padding-left: 1rem;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.luxury-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.85rem 1rem 0.85rem 0.65rem;
+  font-family: var(--font-primary);
+  font-size: 0.95rem;
+  color: var(--charcoal);
+  border-radius: 0.9rem;
+  outline: none;
+  width: 100%;
+}
+
+.luxury-input.disabled-input {
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.form-hint-text {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+.profile-form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  border-top: 1px solid rgba(196, 155, 59, 0.15);
+  padding-top: 1.5rem;
+}
+
+.profile-submit-btn,
+.profile-cancel-btn,
+.profile-logout-btn {
+  flex: 1;
+  min-height: 48px;
+  font-size: 0.95rem;
+}
+
+.profile-logout-btn {
+  background: #dc3545;
+  color: var(--white);
+  border: none;
+  border-radius: 1rem;
+  font-family: var(--font-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.profile-logout-btn:hover {
+  background: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);
+}
+
+.profile-logout-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.profile-cancel-btn {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--charcoal);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 1rem;
+  font-family: var(--font-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.profile-cancel-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.profile-cancel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 768px) {
+  .dashboard-tabs-container {
+    padding: 0 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .dashboard-tabs {
+    width: 100%;
+    display: flex;
+  }
+  
+  .dashboard-tab-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+  }
+
+  .profile-modal {
+    padding: 1.5rem;
+    border-radius: 1.5rem;
+  }
+  
+  .profile-card-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .profile-avatar {
+    margin: 0 auto;
+  }
+}

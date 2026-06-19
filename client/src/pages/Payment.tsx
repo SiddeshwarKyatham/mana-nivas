@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { supabase } from '../supabaseClient';
+import { api } from '../lib/api';
 import { BookingPayload, Room, toRoom } from '../types/supabase';
 import { useAuth } from '../context/AuthContext';
 import { ensureRoomAvailability } from '../lib/booking';
+import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import './payment.css';
 
 interface PaymentFormData {
@@ -18,6 +19,12 @@ interface PaymentFormData {
 }
 
 const Payment: React.FC = () => {
+  // Set dynamic secure SEO tags
+  useDocumentMetadata(
+    'Secure Checkout & Payment',
+    'Finalize your booking with our secure, encrypted room payment processing portal.'
+  );
+
   const { roomId, checkIn, checkOut } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -47,10 +54,7 @@ const Payment: React.FC = () => {
     const fetchRoom = async () => {
       if (roomId) {
         try {
-          const { data, error: fetchError } = await supabase.from('rooms').select('*').eq('id', roomId).single();
-          if (fetchError) {
-            throw new Error(fetchError.message || 'Failed to load room details');
-          }
+          const data = await api.get('/rooms/' + roomId);
           setRoom(toRoom(data));
         } catch (error) {
           console.error('Error fetching room:', error);
@@ -66,9 +70,32 @@ const Payment: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    
+    let formattedValue = value;
+    if (name === 'cardNumber') {
+      // Force space spacing format for 16-digit card numbers
+      const digits = value.replace(/\D/g, '');
+      const parts = [];
+      for (let i = 0; i < digits.length && i < 16; i += 4) {
+        parts.push(digits.substring(i, i + 4));
+      }
+      formattedValue = parts.join(' ');
+    } else if (name === 'expiryDate') {
+      // Force MM/YY slash formatting
+      const digits = value.replace(/\D/g, '');
+      if (digits.length > 2) {
+        formattedValue = `${digits.substring(0, 2)}/${digits.substring(2, 4)}`;
+      } else {
+        formattedValue = digits;
+      }
+    } else if (name === 'cvv') {
+      // Allow digits only up to 4 chars
+      formattedValue = value.replace(/\D/g, '').substring(0, 4);
+    }
+    
     setFormData(prev => ({
       ...prev,
-      [name]: value,
+      [name]: formattedValue,
     }));
   };
 
@@ -104,21 +131,12 @@ const Payment: React.FC = () => {
 
       await ensureRoomAvailability(bookingData.roomId, bookingData.checkIn, bookingData.checkOut);
 
-      const { data: booking, error: bookingError } = await supabase
-        .from('bookings')
-        .insert({
-          user_id: user._id,
-          room_id: bookingData.roomId,
-          check_in: bookingData.checkIn,
-          check_out: bookingData.checkOut,
-          total_price: bookingData.totalPrice,
-        })
-        .select('*')
-        .single();
-
-      if (bookingError) {
-        throw new Error(bookingError.message || 'Failed to create booking');
-      }
+      const booking = await api.post('/bookings', {
+        room_id: bookingData.roomId,
+        check_in: bookingData.checkIn,
+        check_out: bookingData.checkOut,
+        total_price: bookingData.totalPrice,
+      });
 
       setTimeout(() => {
         setProcessing(false);
@@ -204,7 +222,7 @@ const Payment: React.FC = () => {
             </div>
             <div className="summary-item">
               <span>Price per night:</span>
-              <span>${room.price.toLocaleString()}</span>
+              <span>₹{room.price.toLocaleString()}</span>
             </div>
             <div className="summary-item">
               <span>Nights:</span>
@@ -212,7 +230,7 @@ const Payment: React.FC = () => {
             </div>
             <div className="summary-item total">
               <span>Total:</span>
-              <span>${calculateTotal().toLocaleString()}</span>
+              <span>₹{calculateTotal().toLocaleString()}</span>
             </div>
             <ul className="payment-trust-list">
               <li>Secure and encrypted checkout session</li>
@@ -342,7 +360,7 @@ const Payment: React.FC = () => {
                 className="btn-primary"
                 disabled={processing}
               >
-                {processing ? 'Processing...' : `Pay $${calculateTotal().toLocaleString()}`}
+                {processing ? 'Processing...' : `Pay ₹${calculateTotal().toLocaleString()}`}
               </button>
             </div>
           </form>

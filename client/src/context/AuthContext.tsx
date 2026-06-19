@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState, ReactNode } from 'react';
-import type { Session, User as SupabaseUser } from '@supabase/supabase-js';
-import { supabase } from '../supabaseClient';
+import { api } from '../lib/api';
 
 interface AppUser {
   _id: string;
@@ -11,110 +10,75 @@ interface AppUser {
 
 interface AuthContextType {
   user: AppUser | null;
-  session: Session | null;
-  token: string | null;
   isAuthenticated: boolean;
   loading: boolean;
+  login: (token: string, user: AppUser) => void;
+  updateUser: (user: AppUser) => void;
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const mapSupabaseUser = (supabaseUser: SupabaseUser | null, profile?: { full_name?: string | null; role?: string | null }): AppUser | null => {
-  if (!supabaseUser) return null;
-
-  const metadata = supabaseUser.user_metadata || {};
-  const fullName = profile?.full_name || (metadata.full_name as string) || '';
-  const resolvedRole: 'user' | 'admin' = profile?.role === 'admin' ? 'admin' : 'user';
-
-  return {
-    _id: supabaseUser.id,
-    name: fullName || supabaseUser.email?.split('@')[0] || 'User',
-    email: supabaseUser.email || '',
-    role: resolvedRole,
-  };
-};
-
-const getProfile = async (userId: string): Promise<{ full_name?: string | null; role?: string | null } | undefined> => {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('full_name, role')
-    .eq('id', userId)
-    .single();
-
-  if (error) {
-    return undefined;
-  }
-
-  return data as { full_name?: string | null; role?: string | null };
-};
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    let isMounted = true;
-
-    const initializeAuth = async () => {
-      try {
-        const { data, error } = await supabase.auth.getSession();
-        if (error) throw error;
-        if (!isMounted) return;
-
-        setSession(data.session);
-        const supabaseUser = data.session?.user ?? null;
-        const profile = supabaseUser ? await getProfile(supabaseUser.id) : undefined;
-        setUser(mapSupabaseUser(supabaseUser, profile));
-      } catch (error) {
-        console.error('Failed to initialize Supabase auth:', error);
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    initializeAuth();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
-      if (!isMounted) return;
-      setSession(newSession);
-      const supabaseUser = newSession?.user ?? null;
-      const profile = supabaseUser ? await getProfile(supabaseUser.id) : undefined;
-      if (!isMounted) return;
-      setUser(mapSupabaseUser(supabaseUser, profile));
+  const checkAuth = async () => {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      setUser(null);
       setLoading(false);
-    });
+      return;
+    }
 
-    return () => {
-      isMounted = false;
-      subscription.unsubscribe();
-    };
+    try {
+      const data = await api.get('/auth/me');
+      if (data && data.user) {
+        setUser(data.user);
+      } else {
+        localStorage.removeItem('auth_token');
+        setUser(null);
+      }
+    } catch (err) {
+      console.error('Session verification failed, logging out:', err);
+      localStorage.removeItem('auth_token');
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    checkAuth();
   }, []);
 
+  const login = (token: string, loggedInUser: AppUser) => {
+    localStorage.setItem('auth_token', token);
+    setUser(loggedInUser);
+  };
+
+  const updateUser = (updatedUser: AppUser) => {
+    setUser(updatedUser);
+  };
+
   const logout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      throw error;
-    }
-    setSession(null);
+    localStorage.removeItem('auth_token');
     setUser(null);
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
+    }
   };
 
   const value = useMemo<AuthContextType>(
     () => ({
       user,
-      session,
-      token: session?.access_token ?? null,
-      isAuthenticated: !!session?.user,
+      isAuthenticated: !!user,
       loading,
+      login,
+      updateUser,
       logout,
     }),
-    [user, session, loading]
+    [user, loading]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

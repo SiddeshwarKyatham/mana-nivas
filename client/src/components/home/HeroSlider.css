@@ -1,0 +1,194 @@
+/* HeroSlider Component Styles - Flagship Quality */
+.hero-section {
+  position: relative;
+  height: 100vh;
+  min-height: 700px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  background-color: var(--background-dark);
+}
+
+.hero-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(28, 27, 26, 0.3) 0%,
+    rgba(28, 27, 26, 0.5) 50%,
+    rgba(28, 27, 26, 0.8) 100%
+  );
+  z-index: 2;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 3;
+  max-width: 900px;
+  padding: 0 2rem;
+  color: var(--ivory);
+  width: 100%;
+}
+
+.hero-headline {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 6vw, 5rem);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.5rem;
+  color: var(--ivory);
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.hero-subheadline {
+  font-family: var(--font-primary);
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
+  font-weight: 300;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto 3rem auto;
+  color: rgba(247, 245, 240, 0.9);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 0.5rem;
+  background-color: transparent;
+  color: var(--white);
+  text-decoration: none;
+  font-family: var(--font-primary);
+  font-weight: 500;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  position: relative;
+  cursor: pointer;
+}
+
+.hero-cta::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--primary-color);
+  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero-cta:hover {
+  color: var(--primary-color);
+}
+
+.hero-cta:hover::after {
+  width: 100%;
+}
+
+.hero-cta svg {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero-cta:hover svg {
+  transform: translateX(8px);
+}
+
+/* Navigation Buttons */
+.hero-nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--white);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  z-index: 4;
+}
+
+.hero-nav-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--white);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.hero-nav-prev {
+  left: 3rem;
+}
+
+.hero-nav-next {
+  right: 3rem;
+}
+
+.hero-nav-button svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Dots */
+.hero-dots {
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1rem;
+  z-index: 4;
+}
+
+.hero-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  padding: 0;
+}
+
+.hero-dot:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.hero-dot.active {
+  background: var(--primary-color);
+  transform: scale(1.5);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero-nav-prev { left: 1rem; }
+  .hero-nav-next { right: 1rem; }
+  
+  .hero-nav-button {
+    width: 44px;
+    height: 44px;
+  }
+}

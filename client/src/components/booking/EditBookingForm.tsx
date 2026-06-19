@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import './BookingForm.css';
+import { api } from '../../lib/api';
 
 interface Room {
   id: string;
@@ -32,6 +33,7 @@ const EditBookingForm: React.FC = () => {
     specialRequests: ''
   });
 
+  const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -39,21 +41,23 @@ const EditBookingForm: React.FC = () => {
   useEffect(() => {
     const fetchBookingDetails = async () => {
       try {
-        // For now, we'll need to implement getBookingById in the API
-        // This is a placeholder - you'll need to add this API endpoint
-        // const bookingData = await getBookingById(bookingId);
-        // setBooking(bookingData);
-        // setFormData({
-        //   checkIn: new Date(bookingData.checkIn),
-        //   checkOut: new Date(bookingData.checkOut),
-        //   specialRequests: bookingData.specialRequests || ''
-        // });
-        
-        // For now, we'll show a message that editing is not yet implemented
-        setError('Edit booking functionality is not yet implemented. Please contact support to modify your booking.');
-      } catch (err) {
+        setError('');
+        const bookingData = await api.get(`/bookings/${bookingId}`);
+
+        if (bookingData) {
+          setBooking({ id: bookingData.id });
+          setRoom(bookingData.room);
+          setFormData({
+            checkIn: bookingData.check_in ? new Date(bookingData.check_in) : null,
+            checkOut: bookingData.check_out ? new Date(bookingData.check_out) : null,
+            specialRequests: bookingData.special_requests || ''
+          });
+        }
+      } catch (err: any) {
         console.error('Error fetching booking:', err);
-        setError('Failed to load booking details');
+        setError(err.message || 'Failed to load booking details');
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -83,14 +87,32 @@ const EditBookingForm: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setError('');
-    
+
+    if (!formData.checkIn || !formData.checkOut) {
+      setError('Please select check-in and check-out dates');
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!room) {
+      setError('Room details not loaded');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
-      // For now, we'll show a message that editing is not yet implemented
-      setError('Edit booking functionality is not yet implemented. Please contact support to modify your booking.');
-      
-      // TODO: Implement updateBooking API call
-      // const response = await updateBooking(bookingId, formData);
-      // navigate('/dashboard');
+      const start = new Date(formData.checkIn);
+      const end = new Date(formData.checkOut);
+      const nights = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+      const newTotal = room.price * (nights > 0 ? nights : 1);
+
+      await api.put(`/bookings/${bookingId}`, {
+        check_in: formData.checkIn.toISOString(),
+        check_out: formData.checkOut.toISOString(),
+        total_price: newTotal
+      });
+
+      navigate('/dashboard');
     } catch (error: any) {
       console.error('Update failed:', error);
       setError(error.message || 'Update failed. Please try again.');
@@ -103,22 +125,7 @@ const EditBookingForm: React.FC = () => {
     navigate('/dashboard');
   };
 
-  if (error && error.includes('not yet implemented')) {
-    return (
-      <div className="booking-form-container">
-        <div className="error-message">
-          {error}
-        </div>
-        <div className="button-group">
-          <button onClick={handleCancel} className="prev-btn">
-            Back to Dashboard
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!booking) {
+  if (loading) {
     return (
       <div className="booking-form-container">
         <div className="loading">Loading booking details...</div>
@@ -189,4 +196,4 @@ const EditBookingForm: React.FC = () => {
   );
 };
 
-export default EditBookingForm; 
+export default EditBookingForm;

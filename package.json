@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "description": "Mana Nivas Hotel Booking Application",
   "scripts": {
-    "dev": "cd client && npm run dev",
-    "build": "cd client && npm run build",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "build:client": "cd client && npm run build",
+    "build:server": "cd server && npm run build",
+    "build": "npm run build:client && npm run build:server",
     "preview": "cd client && npm run preview",
-    "install-all": "npm install && cd client && npm install"
+    "install-all": "npm install && cd client && npm install && cd ../server && npm install"
   }
 }

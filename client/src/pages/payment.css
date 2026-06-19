@@ -2,8 +2,8 @@
 
 .payment-page {
   min-height: 100vh;
-  background: linear-gradient(180deg, var(--ivory) 0%, var(--background-gray) 100%);
-  padding: var(--spacing-xl) 0;
+  background: var(--background-gray);
+  padding: 10rem 0 6rem 0; /* Clear navbar with spacious padding */
 }
 
 .payment-container {
@@ -40,12 +40,13 @@
 
 .booking-summary {
   position: sticky;
-  top: 100px;
-  padding: var(--spacing-lg);
-  border-radius: var(--border-radius-xl);
-  background: var(--background-light);
-  border: 1px solid rgba(196, 155, 59, 0.2);
-  box-shadow: var(--shadow-card);
+  top: 120px;
+  padding: 2.5rem;
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
 }
 
 .booking-summary h3 {
@@ -109,11 +110,11 @@
 }
 
 .payment-form {
-  padding: var(--spacing-xl);
-  border-radius: var(--border-radius-xl);
-  background: var(--background-light);
-  border: 1px solid rgba(196, 155, 59, 0.2);
-  box-shadow: var(--shadow-card);
+  padding: 3rem;
+  border-radius: 1.5rem;
+  background: var(--white);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
 }
 
 .form-section + .form-section {
@@ -141,19 +142,22 @@
 
 .form-group input {
   width: 100%;
-  min-height: 46px;
-  padding: 0.75rem 0.9rem;
+  min-height: 52px;
+  padding: 0.75rem 1.2rem;
   border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-md);
-  font-size: 0.95rem;
+  border-radius: 0.5rem;
+  font-family: var(--font-primary);
+  font-size: 1rem;
   color: var(--text-dark);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: var(--background-light);
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(196, 155, 59, 0.12);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+  transform: translateY(-2px);
 }
 
 .form-row {

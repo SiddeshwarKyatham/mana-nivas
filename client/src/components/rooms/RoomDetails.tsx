@@ -5,13 +5,22 @@ import { supabase } from '../../supabaseClient';
 import { BookingPayload, Room, toRoom } from '../../types/supabase';
 import { useAuth } from '../../context/AuthContext';
 import { ensureRoomAvailability } from '../../lib/booking';
+import { useDocumentMetadata } from '../../hooks/useDocumentMetadata';
 import './RoomDetails.css';
+
+import { api } from '../../lib/api';
 
 const RoomDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [room, setRoom] = useState<Room | null>(null);
+
+  // Set high-prestige SEO details dynamically based on room
+  useDocumentMetadata(
+    room ? `${room.name} Suite` : 'Room Details',
+    room ? room.description : 'Explore premium hotel rooms and luxury suites at Mana Nivas.'
+  );
   const [loading, setLoading] = useState(true);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [error, setError] = useState('');
@@ -36,10 +45,7 @@ const RoomDetails: React.FC = () => {
 
   const fetchRoomDetails = async () => {
     try {
-      const { data, error: fetchError } = await supabase.from('rooms').select('*').eq('id', id).single();
-      if (fetchError) {
-        throw new Error(fetchError.message || 'Failed to load room details');
-      }
+      const data = await api.get('/rooms/' + id);
       setRoom(toRoom(data));
     } catch (err: any) {
       setError(err.message || 'Failed to load room details');
@@ -48,7 +54,8 @@ const RoomDetails: React.FC = () => {
     }
   };
 
-  const handleBookNow = async () => {
+
+  const handleBookNow = () => {
     if (!user) {
       navigate('/login');
       return;
@@ -64,51 +71,8 @@ const RoomDetails: React.FC = () => {
       return;
     }
 
-    setBookingLoading(true);
-    setError('');
-
-    try {
-      const bookingData: BookingPayload = {
-        roomId: room.id,
-        checkIn: new Date(checkIn).toISOString(),
-        checkOut: new Date(checkOut).toISOString(),
-        totalPrice: calculateTotal(),
-      };
-
-      await ensureRoomAvailability(bookingData.roomId, bookingData.checkIn, bookingData.checkOut);
-
-      const { data: createdBooking, error: createError } = await supabase
-        .from('bookings')
-        .insert({
-          user_id: user._id,
-          room_id: bookingData.roomId,
-          check_in: bookingData.checkIn,
-          check_out: bookingData.checkOut,
-          total_price: bookingData.totalPrice,
-        })
-        .select('*')
-        .single();
-
-      if (createError) {
-        throw new Error(createError.message || 'Failed to create booking');
-      }
-
-      navigate('/booking-confirmation', {
-        state: {
-          booking: createdBooking,
-          room,
-          checkIn,
-          checkOut,
-          total: calculateTotal(),
-        },
-      });
-
-    } catch (error: any) {
-      console.error('Error creating booking:', error);
-      setError(error.message || 'Failed to create booking. Please try again.');
-    } finally {
-      setBookingLoading(false);
-    }
+    // Redirect the user to the Payment component to complete billing details and create the booking
+    navigate(`/payment/${room.id}/${checkIn}/${checkOut}`);
   };
 
   const calculateTotal = () => {
@@ -148,33 +112,27 @@ const RoomDetails: React.FC = () => {
         <p className="room-type">{room.type}</p>
       </div>
 
-      <div className="room-gallery">
-        <div className="main-image">
+      <div className="room-gallery-asymmetric">
+        <div className="gallery-main">
           <img 
-            src={room.images[selectedImage] 
-              ? (room.images[selectedImage].startsWith('http') 
-                  ? room.images[selectedImage] 
-                  : room.images[selectedImage])
-              : '/placeholder-room.jpg'} 
-            alt={room.name} 
+            src={room.images[0] ? (room.images[0].startsWith('http') ? room.images[0] : room.images[0]) : '/placeholder-room.jpg'} 
+            alt={`${room.name} Main`} 
           />
         </div>
         {room.images.length > 1 && (
-          <div className="thumbnail-grid">
-            {room.images.map((image, index) => (
-              <div 
-                key={index}
-                className={`thumbnail ${selectedImage === index ? 'active' : ''}`}
-                onClick={() => setSelectedImage(index)}
-              >
-                <img 
-                  src={image.startsWith('http') 
-                    ? image 
-                    : image} 
-                  alt={`${room.name} ${index + 1}`} 
-                />
-              </div>
-            ))}
+          <div className="gallery-side">
+            <div className="gallery-sub">
+              <img 
+                src={room.images[1] ? (room.images[1].startsWith('http') ? room.images[1] : room.images[1]) : (room.images[0] || '/placeholder-room.jpg')} 
+                alt={`${room.name} View 2`} 
+              />
+            </div>
+            <div className="gallery-sub">
+              <img 
+                src={room.images[2] ? (room.images[2].startsWith('http') ? room.images[2] : room.images[2]) : (room.images[0] || '/placeholder-room.jpg')} 
+                alt={`${room.name} View 3`} 
+              />
+            </div>
           </div>
         )}
       </div>
@@ -234,7 +192,7 @@ const RoomDetails: React.FC = () => {
           <div className="price-tag">
             <div className="rate-row">
               <span className="rate-label">Nightly Rate</span>
-              <span className="amount">${nightlyRate.toLocaleString()}</span>
+              <span className="amount">₹{nightlyRate.toLocaleString()}</span>
             </div>
             <div className="rate-row subtle">
               <span>Stay length</span>
@@ -242,7 +200,7 @@ const RoomDetails: React.FC = () => {
             </div>
             <div className="rate-row total">
               <span>Total</span>
-              <span>${calculateTotal().toLocaleString()}</span>
+              <span>₹{calculateTotal().toLocaleString()}</span>
             </div>
           </div>
 

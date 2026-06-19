@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { FaUsers, FaBed, FaCalendarAlt, FaChartBar } from 'react-icons/fa';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import {
+  FaUsers, FaBed, FaCalendarAlt, FaChartBar,
+  FaTachometerAlt, FaSignOutAlt, FaBell, FaCircle
+} from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../supabaseClient';
+import { api } from '../lib/api';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
 import ConfirmDialog from '../components/shared/ConfirmDialog';
 import './AdminDashboard.css';
@@ -12,6 +16,7 @@ interface DashboardBooking {
   check_in: string;
   check_out: string;
   status: string;
+  total_price?: number;
   profiles: { full_name: string | null; phone: string | null } | null;
   rooms: { name: string; type: string } | null;
 }
@@ -24,16 +29,34 @@ interface DashboardUser {
   created_at: string | null;
 }
 
+const containerVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08 } }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 260, damping: 22 } }
+};
+
+const NAV_ITEMS = [
+  { icon: FaTachometerAlt, label: 'Dashboard', to: '/admin' },
+  { icon: FaBed,           label: 'Rooms',     to: '/admin/rooms' },
+  { icon: FaCalendarAlt,  label: 'Bookings',   to: '/admin/bookings' },
+  { icon: FaUsers,         label: 'Users',      to: '/admin/users' },
+  { icon: FaChartBar,      label: 'Analytics',  to: '/admin/analytics' },
+];
+
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const location = useLocation();
+  const { user, isAuthenticated, loading: authLoading, logout } = useAuth();
 
   const [bookings, setBookings] = useState<DashboardBooking[]>([]);
   const [users, setUsers] = useState<DashboardUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [usersLoading, setUsersLoading] = useState(true);
   const [error, setError] = useState('');
-  const [usersError, setUsersError] = useState('');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [pendingCancelId, setPendingCancelId] = useState<string | null>(null);
 
@@ -49,25 +72,9 @@ const AdminDashboard: React.FC = () => {
 
   const fetchBookings = async () => {
     setLoading(true);
-    setError('');
     try {
-      const { data, error: fetchError } = await supabase
-        .from('bookings')
-        .select(`
-          id,
-          check_in,
-          check_out,
-          status,
-          profiles ( full_name, phone ),
-          rooms ( name, type )
-        `)
-        .order('created_at', { ascending: false });
-
-      if (fetchError) {
-        throw new Error(fetchError.message || 'Failed to fetch bookings');
-      }
-
-      setBookings((data as DashboardBooking[]) || []);
+      const data = await api.get('/bookings');
+      setBookings((data as unknown as DashboardBooking[]) || []);
     } catch (err: any) {
       setError(err?.message || 'Failed to fetch bookings');
     } finally {
@@ -77,158 +84,168 @@ const AdminDashboard: React.FC = () => {
 
   const fetchUsers = async () => {
     setUsersLoading(true);
-    setUsersError('');
     try {
-      const { data, error: fetchError } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
-      if (fetchError) throw new Error(fetchError.message || 'Failed to fetch users');
+      const data = await api.get('/users');
       setUsers((data as DashboardUser[]) || []);
-    } catch (err: any) {
-      setUsersError(err?.message || 'Failed to fetch users');
     } finally {
       setUsersLoading(false);
     }
   };
 
-  const handleCancel = async (bookingId: string) => {
-    setUpdatingId(bookingId);
+  const handleCancel = async (id: string) => {
+    setUpdatingId(id);
     try {
-      const { error: cancelError } = await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', bookingId);
-      if (cancelError) throw new Error(cancelError.message || 'Error cancelling booking');
+      await api.put(`/bookings/${id}`, { status: 'cancelled' });
       await fetchBookings();
-    } catch (err: any) {
-      setError(err?.message || 'Error cancelling booking');
     } finally {
       setUpdatingId(null);
       setPendingCancelId(null);
     }
   };
 
-  const countBooked = bookings.filter((b) => b.status === 'booked').length;
-  const countCancelled = bookings.filter((b) => b.status === 'cancelled').length;
+  const countBooked    = bookings.filter(b => b.status === 'booked').length;
+  const countCancelled = bookings.filter(b => b.status === 'cancelled').length;
+  const totalRevenue   = bookings.filter(b => b.status === 'booked').reduce((s, b) => s + (b.total_price || 0), 0);
 
   if (authLoading) {
-    return (
-      <div className="admin-dashboard-container">
-        <LoadingSpinner size="large" message="Checking admin access..." />
-      </div>
-    );
+    return <div className="cmd-loading"><LoadingSpinner size="large" message="Authenticating..." /></div>;
   }
 
   return (
     <div className="admin-dashboard-container">
-      <div className="admin-header">
-        <h1>Admin Dashboard</h1>
-        <div className="admin-nav">
-          <Link to="/admin/rooms" className="admin-nav-item"><FaBed /><span>Room Management</span></Link>
-          <Link to="/admin/bookings" className="admin-nav-item"><FaCalendarAlt /><span>Bookings</span></Link>
-          <Link to="/admin/users" className="admin-nav-item"><FaUsers /><span>User Management</span></Link>
-          <Link to="/admin/analytics" className="admin-nav-item"><FaChartBar /><span>Analytics</span></Link>
-        </div>
-      </div>
+      {/* KPI Grid */}
+      <motion.div className="cmd-kpi-grid" variants={containerVariants} initial="hidden" animate="show">
+          {[
+            { label: 'Total Bookings',      value: bookings.length, sub: `${countBooked} active`,  color: '#D4AF37', glow: 'rgba(212,175,55,0.3)'  },
+            { label: 'Active Reservations', value: countBooked,     sub: 'Currently booked',       color: '#5C946E', glow: 'rgba(92,148,110,0.3)'  },
+            { label: 'Cancellations',       value: countCancelled,  sub: 'All time',                color: '#D45C5C', glow: 'rgba(212,92,92,0.28)'  },
+            { label: 'Registered Users',    value: users.length,    sub: 'Accounts total',          color: '#E5C77B', glow: 'rgba(229,199,123,0.28)'},
+          ].map((kpi, i) => (
+            <motion.div
+              key={i}
+              className="cmd-kpi-card"
+              variants={itemVariants}
+              whileHover={{ y: -6, boxShadow: `0 20px 50px ${kpi.glow}` }}
+              style={{ '--kpi-color': kpi.color, '--kpi-glow': kpi.glow } as React.CSSProperties}
+            >
+              <div className="cmd-kpi-glow-ring" />
+              <span className="cmd-kpi-label">{kpi.label}</span>
+              <span className="cmd-kpi-value">{kpi.value}</span>
+              <span className="cmd-kpi-sub">{kpi.sub}</span>
+              <div className="cmd-kpi-bar">
+                <motion.div
+                  className="cmd-kpi-bar-fill"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${Math.min(100, (kpi.value / Math.max(bookings.length || 1, users.length || 1)) * 100)}%` }}
+                  transition={{ delay: 0.3 + i * 0.1, duration: 0.8, ease: 'easeOut' }}
+                />
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
 
-      <div className="admin-stats">
-        <div className="stat-card"><h3>Total Bookings</h3><p className="stat-number">{bookings.length}</p></div>
-        <div className="stat-card"><h3>Booked</h3><p className="stat-number">{countBooked}</p></div>
-        <div className="stat-card"><h3>Cancelled</h3><p className="stat-number">{countCancelled}</p></div>
-        <div className="stat-card"><h3>Total Users</h3><p className="stat-number">{users.length}</p></div>
-      </div>
+        {/* Revenue Banner */}
+        <motion.div
+          className="cmd-revenue-banner"
+          initial={{ opacity: 0, scaleX: 0.95 }}
+          animate={{ opacity: 1, scaleX: 1 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+        >
+          <div className="cmd-revenue-label">Total Revenue (Active Bookings)</div>
+          <div className="cmd-revenue-value">₹{totalRevenue.toLocaleString('en-IN')}</div>
+          <div className="cmd-revenue-shimmer" />
+        </motion.div>
 
-      {loading ? (
-        <p className="admin-loading-text">Loading bookings...</p>
-      ) : error ? (
-        <p className="admin-inline-error">{error}</p>
-      ) : (
-        <div className="admin-table-wrapper">
-          <h2>Recent Bookings</h2>
-          <div className="admin-table-scroll">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>User</th>
-                  <th>Room</th>
-                  <th>Dates</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {bookings.slice(0, 20).map((b) => (
-                  <tr key={b.id}>
-                    <td>{b.id}</td>
-                    <td>
-                      <div>{b.profiles?.full_name || 'Unknown user'}</div>
-                      <div className="admin-meta">{b.profiles?.phone || '-'}</div>
-                    </td>
-                    <td>
-                      <strong>{b.rooms?.name || 'Unknown room'}</strong> {b.rooms?.type ? `(${b.rooms.type})` : ''}
-                    </td>
-                    <td>{new Date(b.check_in).toLocaleDateString()} to {new Date(b.check_out).toLocaleDateString()}</td>
-                    <td>
-                      <span className={`status-chip ${b.status === 'booked' ? 'booked' : b.status === 'cancelled' ? 'cancelled' : 'pending'}`}>
-                        {b.status}
-                      </span>
-                    </td>
-                    <td>
-                      {b.status === 'booked' && (
-                        <button disabled={updatingId === b.id} onClick={() => setPendingCancelId(b.id)}>
-                          {updatingId === b.id ? 'Cancelling...' : 'Cancel'}
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+        {/* Activity + Users Split */}
+        <motion.div className="cmd-panels" variants={containerVariants} initial="hidden" animate="show">
+          {/* Recent Bookings feed */}
+          <motion.div className="cmd-panel" variants={itemVariants}>
+            <div className="cmd-panel-header">
+              <span>Recent Bookings</span>
+              <Link to="/admin/bookings" className="cmd-view-all">View All →</Link>
+            </div>
+            <div className="cmd-feed">
+              {loading ? (
+                <div className="cmd-panel-loader"><LoadingSpinner size="medium" /></div>
+              ) : bookings.slice(0, 6).map((b, i) => (
+                <motion.div
+                  key={b.id}
+                  className="cmd-feed-row"
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.05 * i }}
+                  whileHover={{ backgroundColor: 'rgba(212,175,55,0.04)' }}
+                >
+                  <div className="cmd-feed-avatar">
+                    {b.profiles?.full_name?.charAt(0).toUpperCase() || 'U'}
+                  </div>
+                  <div className="cmd-feed-info">
+                    <strong>{b.profiles?.full_name || 'Unknown'}</strong>
+                    <span>{b.rooms?.name || 'Unknown Room'} · {new Date(b.check_in).toLocaleDateString('en-IN')}</span>
+                  </div>
+                  <div className="cmd-feed-right">
+                    <span className={`cmd-pill ${b.status}`}>{b.status}</span>
+                    {b.status === 'booked' && (
+                      <button
+                        className="cmd-cancel-btn"
+                        disabled={updatingId === b.id}
+                        onClick={() => setPendingCancelId(b.id)}
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
 
-      {usersLoading ? (
-        <p className="admin-loading-text">Loading users...</p>
-      ) : usersError ? (
-        <p className="admin-inline-error">{usersError}</p>
-      ) : (
-        <div className="admin-table-wrapper admin-section-gap">
-          <h2>Recent Users</h2>
-          <div className="admin-table-scroll">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Phone</th>
-                  <th>Role</th>
-                  <th>Joined</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.slice(0, 20).map((u) => (
-                  <tr key={u.id}>
-                    <td>{u.full_name || 'Unknown'}</td>
-                    <td>{u.phone || '-'}</td>
-                    <td>{u.role}</td>
-                    <td>{u.created_at ? new Date(u.created_at).toLocaleDateString() : '-'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+          {/* Users panel */}
+          <motion.div className="cmd-panel" variants={itemVariants}>
+            <div className="cmd-panel-header">
+              <span>Recent Users</span>
+              <Link to="/admin/users" className="cmd-view-all">View All →</Link>
+            </div>
+            <div className="cmd-feed">
+              {usersLoading ? (
+                <div className="cmd-panel-loader"><LoadingSpinner size="medium" /></div>
+              ) : users.slice(0, 6).map((u, i) => (
+                <motion.div
+                  key={u.id}
+                  className="cmd-feed-row"
+                  initial={{ opacity: 0, x: 12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.05 * i }}
+                  whileHover={{ backgroundColor: 'rgba(212,175,55,0.04)' }}
+                >
+                  <div className="cmd-feed-avatar alt">
+                    {u.full_name?.charAt(0).toUpperCase() || 'U'}
+                  </div>
+                  <div className="cmd-feed-info">
+                    <strong>{u.full_name || 'Unnamed'}</strong>
+                    <span>{u.phone || 'No phone · '}{u.created_at ? new Date(u.created_at).toLocaleDateString('en-IN') : ''}</span>
+                  </div>
+                  <div className="cmd-feed-right">
+                    <span className={`cmd-role-badge ${u.role}`}>{u.role}</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </motion.div>
+
+        {error && <p className="cmd-error">{error}</p>}
+
       <ConfirmDialog
         open={Boolean(pendingCancelId)}
         title="Cancel booking?"
-        message="This will mark the booking as cancelled. You can keep it for audit history."
-        confirmLabel="Yes, cancel booking"
-        cancelLabel="Keep booking"
+        message="This will mark the booking as cancelled. The record is kept for audit purposes."
+        confirmLabel="Yes, cancel"
+        cancelLabel="Keep"
         danger
         busy={Boolean(updatingId)}
         onCancel={() => setPendingCancelId(null)}
-        onConfirm={() => {
-          if (pendingCancelId) {
-            handleCancel(pendingCancelId);
-          }
-        }}
+        onConfirm={() => { if (pendingCancelId) handleCancel(pendingCancelId); }}
       />
     </div>
   );

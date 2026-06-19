@@ -15,7 +15,7 @@
 
 .room-search-container .rs-header h2 {
   margin: 0 0 0.35rem;
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-display);
   color: var(--charcoal);
   font-size: clamp(1.35rem, 2.5vw, 1.8rem);
 }
@@ -181,7 +181,7 @@
   margin: 0 0 0.75rem;
   color: var(--charcoal);
   font-size: 1rem;
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-display);
 }
 
 .room-search-container .rs-amenities-grid {

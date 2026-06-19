@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { FaUser } from 'react-icons/fa';
 import './Navbar.css';
 import logo from '../../assets/logo.jpg';
 
@@ -68,9 +69,13 @@ const Navbar = () => {
               {user?.role === 'admin' ? (
                 <Link to="/admin" className="navbar-button dashboard" onClick={() => setIsMenuOpen(false)}>Admin</Link>
               ) : (
-                <Link to="/dashboard" className="navbar-button dashboard" onClick={() => setIsMenuOpen(false)}>Dashboard</Link>
+                <>
+                  <Link to="/dashboard" className="navbar-button dashboard" onClick={() => setIsMenuOpen(false)}>Dashboard</Link>
+                  <Link to="/dashboard?profile=true" className="navbar-button profile-settings" onClick={() => setIsMenuOpen(false)}>
+                    <FaUser style={{ marginRight: '8px' }} /> Profile
+                  </Link>
+                </>
               )}
-              <button onClick={handleLogout} className="navbar-button logout">Logout</button>
             </>
           )}
         </div>

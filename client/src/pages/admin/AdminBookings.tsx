@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
-import { supabase } from '../../supabaseClient';
+import { api } from '../../lib/api';
 import '../AdminDashboard.css';
 
 interface AdminBooking {
@@ -27,31 +27,7 @@ const AdminBookings: React.FC = () => {
     setLoading(true);
     setError('');
     try {
-      const { data, error: fetchError } = await supabase
-        .from('bookings')
-        .select(`
-          id,
-          check_in,
-          check_out,
-          total_price,
-          status,
-          profiles (
-            id,
-            full_name,
-            phone
-          ),
-          rooms (
-            id,
-            name,
-            type
-          )
-        `)
-        .order('created_at', { ascending: false });
-
-      if (fetchError) {
-        throw new Error(fetchError.message || 'Failed to fetch bookings');
-      }
-
+      const data = await api.get('/bookings');
       setBookings((data as any[]) || []);
     } catch (err: any) {
       setError(err?.message || 'Failed to fetch bookings');
@@ -69,8 +45,7 @@ const AdminBookings: React.FC = () => {
   const handleCancel = async (bookingId: string) => {
     setUpdatingId(bookingId);
     try {
-      const { error: cancelError } = await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', bookingId);
-      if (cancelError) throw new Error(cancelError.message || 'Error cancelling booking');
+      await api.put(`/bookings/${bookingId}`, { status: 'cancelled' });
       await fetchBookings();
     } catch (err: any) {
       setError(err?.message || 'Error cancelling booking');
@@ -104,7 +79,6 @@ const AdminBookings: React.FC = () => {
   return (
     <div className="admin-dashboard-container admin-subpage">
       <div className="admin-table-wrapper">
-        <h1>Bookings</h1>
         <div className="admin-kpis">
           <div className="admin-kpi">All: {bookings.length}</div>
           <div className="admin-kpi">Booked: {countBooked}</div>
@@ -137,7 +111,7 @@ const AdminBookings: React.FC = () => {
                   <td>
                     {new Date(b.check_in).toLocaleDateString()} - {new Date(b.check_out).toLocaleDateString()}
                   </td>
-                  <td>${Number(b.total_price || 0).toLocaleString()}</td>
+                  <td>₹{Number(b.total_price || 0).toLocaleString()}</td>
                   <td>
                     <span className={`status-chip ${b.status === 'booked' ? 'booked' : b.status === 'cancelled' ? 'cancelled' : 'pending'}`}>
                       {b.status}

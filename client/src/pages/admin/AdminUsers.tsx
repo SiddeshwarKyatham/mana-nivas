@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
-import { supabase } from '../../supabaseClient';
+import { api } from '../../lib/api';
 import '../AdminDashboard.css';
 
 interface AdminUser {
@@ -22,12 +22,7 @@ const AdminUsers: React.FC = () => {
     setLoading(true);
     setError('');
     try {
-      const { data, error: fetchError } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (fetchError) throw new Error(fetchError.message || 'Failed to fetch users');
+      const data = await api.get('/users');
       setUsers((data as AdminUser[]) || []);
     } catch (err: any) {
       setError(err?.message || 'Failed to fetch users');
@@ -35,6 +30,7 @@ const AdminUsers: React.FC = () => {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     if (authLoading) return;
@@ -63,7 +59,6 @@ const AdminUsers: React.FC = () => {
   return (
     <div className="admin-dashboard-container admin-subpage">
       <div className="admin-table-wrapper">
-        <h1>Users</h1>
         <div className="admin-kpis">
           <div className="admin-kpi">Total: {users.length}</div>
         </div>

@@ -23,7 +23,7 @@
 }
 
 .team-hero-content h1 {
-  font-family: 'Cinzel', serif;
+  font-family: var(--font-display);
   font-size: 3rem;
   margin-bottom: var(--spacing-sm);
   font-weight: 600;
@@ -82,7 +82,7 @@
 }
 
 .team-card-content h3 {
-  font-family: 'Cinzel', serif;
+  font-family: var(--font-display);
   font-size: 1.5rem;
   color: var(--text-dark);
   margin-bottom: var(--spacing-xs);

@@ -82,11 +82,11 @@ const BookingConfirmation: React.FC = () => {
             </div>
             <div className="detail-item">
               <span className="label">Price per Night:</span>
-              <span className="value">${bookingData.room.price.toLocaleString()}</span>
+              <span className="value">₹{bookingData.room.price.toLocaleString()}</span>
             </div>
             <div className="detail-item total-item">
               <span className="label">Total Amount:</span>
-              <span className="value">${bookingData.total.toLocaleString()}</span>
+              <span className="value">₹{bookingData.total.toLocaleString()}</span>
             </div>
           </div>
         </div>

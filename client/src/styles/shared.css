@@ -1,32 +1,36 @@
 :root {
-  /* Original Golden Color Palette */
-  --primary-color: #B8860B;
-  --secondary-color: #DAA520;
-  --accent-color: #FFD700;
-  --gold: #DAA520;
-  --charcoal: #2B2B2B;
-  --ivory: #FAF8F2;
+  /* Premium Gold Color Palette */
+  --primary-color: #D4AF37; /* Metallic Gold */
+  --secondary-color: #E5C77B; /* Champagne Gold highlight */
+  --accent-color: #F3E5AB; /* Subtle Gold */
+  --gold: #D4AF37;
+  --gold-dark: #C5A059;
+  --charcoal: #1A1A1A; /* Deeper, richer black/charcoal */
+  --charcoal-light: #2C2C2C;
+  --ivory: #FAF9F6; /* Brighter, cleaner ivory */
   --white: #FFFFFF;
-  --off-white: #F8F6EF;
-  --slate-gray: #5F6368;
-  --light-gray: #E5E7EB;
-  --plum: #6E4B5E;
-  --text-dark: #333333;
-  --text-light: #666666;
-  --text-muted: #999999;
+  --off-white: #F5F5F5;
+  --slate-gray: #666666;
+  --light-gray: #E0E0E0;
+  --plum: #6E4B5E; /* keeping for compatibility if used */
+  --text-dark: #1A1A1A;
+  --text-light: #5C5855;
+  --text-muted: #8C8782;
   --background-light: #FFFFFF;
-  --background-gray: #F5F5F5;
-  --background-dark: #1A1A1A;
-  --border-color: #E0E0E0;
-  --border-light: #F1F3F4;
-  --error-color: #DC3545;
-  --success-color: #28A745;
-  --warning-color: #FFC107;
-  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.08);
-  --shadow-strong: 0 8px 24px rgba(0, 0, 0, 0.12);
-  --shadow-card: 0 10px 32px rgba(17, 24, 39, 0.08);
-  --shadow-elevated: 0 18px 50px rgba(17, 24, 39, 0.14);
+  --background-gray: #F7F5F0;
+  --background-dark: #1C1B1A;
+  --border-color: #E8E6E1;
+  --border-light: #F1EFE9;
+  --error-color: #D45C5C;
+  --success-color: #5C946E;
+  --warning-color: #D4A05C;
+  
+  /* Soft, diffused shadows */
+  --shadow-soft: 0 4px 20px rgba(44, 42, 41, 0.03);
+  --shadow-medium: 0 8px 30px rgba(44, 42, 41, 0.05);
+  --shadow-strong: 0 12px 40px rgba(44, 42, 41, 0.08);
+  --shadow-card: 0 15px 45px rgba(44, 42, 41, 0.04);
+  --shadow-elevated: 0 20px 60px rgba(44, 42, 41, 0.08);
 
   /* Typography */
   --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -352,3 +356,43 @@ textarea:focus-visible {
     scroll-behavior: auto !important;
   }
 }
+
+/* Skeleton Loader Animation & Premium Shimmer UI */
+.skeleton {
+  background: linear-gradient(90deg, rgba(218, 165, 32, 0.04) 25%, rgba(218, 165, 32, 0.12) 50%, rgba(218, 165, 32, 0.04) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.6s infinite ease-in-out;
+  border-radius: var(--border-radius-sm);
+  display: block;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-text {
+  height: 1rem;
+  margin-bottom: 0.75rem;
+  width: 100%;
+}
+
+.skeleton-title {
+  height: 1.75rem;
+  margin-bottom: 1.25rem;
+  width: 60%;
+}
+
+.skeleton-btn {
+  height: 44px;
+  border-radius: 999px;
+  width: 100%;
+}
+
+.skeleton-card {
+  height: 380px;
+  border-radius: var(--border-radius-xl);
+  border: 1px solid rgba(196, 155, 59, 0.1);
+  box-shadow: var(--shadow-card);
+}
+

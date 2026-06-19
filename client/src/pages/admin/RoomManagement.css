@@ -3,37 +3,16 @@
   padding: var(--spacing-xl);
   max-width: 1200px;
   margin: 0 auto;
-  background: var(--background-gray);
-  min-height: 100vh;
-}
-
-.room-management-header {
-  text-align: center;
-  margin-bottom: var(--spacing-2xl);
-  padding: var(--spacing-xl) 0;
-}
-
-.room-management-header h1 {
-  font-size: 2.25rem;
-  font-weight: 700;
-  color: var(--primary-color);
-  margin-bottom: var(--spacing-sm);
-  letter-spacing: -0.02em;
-}
-
-.room-management-header p {
-  color: var(--text-light);
-  font-size: 1.125rem;
-  margin-bottom: var(--spacing-lg);
-  line-height: 1.6;
+  background: transparent;
+  min-height: auto;
 }
 
 .room-form-container {
-  background: var(--background-light);
+  background: #1a1610;
   border-radius: var(--border-radius-xl);
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   margin-bottom: var(--spacing-2xl);
-  border: 1px solid var(--border-light);
+  border: 1px solid rgba(212, 175, 55, 0.15);
   overflow: hidden;
 }
 
@@ -46,10 +25,35 @@
 .room-form h2 {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--text-dark);
+  color: var(--ivory);
   margin-bottom: var(--spacing-lg);
   text-align: center;
   letter-spacing: -0.01em;
+}
+
+/* Custom Styled Inputs for dark luxury aesthetic */
+.room-form .form-label {
+  color: var(--ivory);
+  font-weight: 500;
+  display: block;
+  margin-bottom: var(--spacing-xs);
+}
+
+.room-form .form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: #13100a !important;
+  border: 1px solid rgba(212, 175, 55, 0.15) !important;
+  color: var(--ivory) !important;
+  border-radius: var(--border-radius-lg);
+  font-family: inherit;
+  transition: all var(--transition-fast);
+}
+
+.room-form .form-input:focus {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2) !important;
+  outline: none;
 }
 
 .form-row {
@@ -78,20 +82,20 @@
 .amenity-tag {
   display: inline-flex;
   align-items: center;
-  background: var(--background-gray);
-  color: var(--text-dark);
+  background: rgba(212, 175, 55, 0.08);
+  color: var(--gold);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--border-radius-md);
   font-size: 0.75rem;
   font-weight: 500;
-  border: 1px solid var(--border-light);
+  border: 1px solid rgba(212, 175, 55, 0.2);
   gap: var(--spacing-xs);
 }
 
 .remove-amenity {
   background: none;
   border: none;
-  color: var(--text-light);
+  color: var(--gold);
   cursor: pointer;
   font-size: 1rem;
   padding: 0;
@@ -105,8 +109,8 @@
 }
 
 .remove-amenity:hover {
-  background: var(--accent-color);
-  color: var(--background-light);
+  background: var(--error-color);
+  color: var(--ivory);
 }
 
 .form-actions {
@@ -123,23 +127,25 @@
 }
 
 .room-card {
-  background: var(--background-light);
+  background: #1a1610;
   border-radius: var(--border-radius-xl);
   overflow: hidden;
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   transition: all var(--transition-normal);
-  border: 1px solid var(--border-light);
+  border: 1px solid rgba(212, 175, 55, 0.1);
 }
 
 .room-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-medium);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(212, 175, 55, 0.18);
+  border-color: rgba(212, 175, 55, 0.35);
 }
 
 .room-images {
   position: relative;
   height: 200px;
   overflow: hidden;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.1);
 }
 
 .room-images img {
@@ -158,9 +164,10 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  background: var(--background-gray);
-  color: var(--text-light);
+  background: #13100a;
+  color: var(--text-muted);
   font-size: 0.875rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.1);
 }
 
 .room-info {
@@ -170,13 +177,13 @@
 .room-info h3 {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--text-dark);
+  color: var(--ivory);
   margin-bottom: var(--spacing-sm);
   letter-spacing: -0.01em;
 }
 
 .room-type {
-  color: var(--secondary-color);
+  color: var(--gold);
   font-size: 0.875rem;
   font-weight: 600;
   margin-bottom: var(--spacing-sm);
@@ -187,12 +194,12 @@
 .room-price {
   font-size: 1.125rem;
   font-weight: 700;
-  color: var(--primary-color);
+  color: var(--gold);
   margin-bottom: var(--spacing-sm);
 }
 
 .room-capacity {
-  color: var(--text-light);
+  color: var(--text-muted);
   font-size: 0.875rem;
   margin-bottom: var(--spacing-md);
 }
@@ -220,6 +227,38 @@
   font-size: 0.875rem;
   padding: var(--spacing-sm) var(--spacing-md);
   min-height: 40px;
+}
+
+/* ── Inline Delete Confirmation ── */
+.inline-delete-confirm {
+  margin-bottom: var(--spacing-lg);
+  background: rgba(220, 38, 38, 0.08);
+  border: 1.5px solid rgba(220, 38, 38, 0.25);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.inline-delete-confirm p {
+  margin: 0 0 var(--spacing-md);
+  font-size: 0.9rem;
+  color: #fecaca;
+  line-height: 1.5;
+}
+
+.inline-delete-confirm p strong {
+  color: var(--error-color);
+}
+
+.inline-delete-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.inline-delete-actions .btn {
+  flex: 1;
+  font-size: 0.85rem;
+  padding: var(--spacing-sm) var(--spacing-md);
+  min-height: 38px;
 }
 
 /* Responsive Design */

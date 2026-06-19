@@ -1,0 +1,60 @@
+.logo-loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+}
+
+.logo-loader-circle {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.logo-loader-ring {
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: var(--primary-color);
+  border-right-color: rgba(212, 175, 55, 0.3);
+}
+
+.logo-loader-ring.inner {
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  border-top-color: rgba(212, 175, 55, 0.5);
+  border-right-color: transparent;
+  border-bottom-color: var(--primary-color);
+}
+
+.logo-loader-image {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 50%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+
+.logo-loader-text {
+  font-family: var(--font-primary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-dark);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}

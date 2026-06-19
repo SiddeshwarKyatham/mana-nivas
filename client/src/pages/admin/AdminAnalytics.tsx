@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
-import { supabase } from '../../supabaseClient';
+import { api } from '../../lib/api';
 import '../AdminDashboard.css';
 
 interface AnalyticsBooking {
@@ -22,8 +22,7 @@ const AdminAnalytics: React.FC = () => {
     setLoading(true);
     setError('');
     try {
-      const { data, error: fetchError } = await supabase.from('bookings').select('*');
-      if (fetchError) throw new Error(fetchError.message || 'Failed to load analytics');
+      const data = await api.get('/bookings');
       setBookings((data as AnalyticsBooking[]) || []);
     } catch (err: any) {
       setError(err?.message || 'Failed to load analytics');
@@ -71,10 +70,10 @@ const AdminAnalytics: React.FC = () => {
     <div className="admin-dashboard-container admin-subpage">
       <div className="admin-analytics-header">
         <h1>Analytics</h1>
-        <p>Live booking and revenue insights from Supabase.</p>
+        <p>Live booking and revenue insights from Neon Postgres.</p>
       </div>
       <div className="admin-stats">
-        <div className="stat-card"><h3>Total Revenue</h3><p className="stat-number">${totals.totalRevenue.toLocaleString()}</p></div>
+        <div className="stat-card"><h3>Total Revenue</h3><p className="stat-number">₹{totals.totalRevenue.toLocaleString()}</p></div>
         <div className="stat-card"><h3>Total Bookings</h3><p className="stat-number">{totals.totalBookings}</p></div>
         <div className="stat-card"><h3>Active Bookings</h3><p className="stat-number">{totals.activeBookings}</p></div>
         <div className="stat-card"><h3>Occupancy Rate</h3><p className="stat-number">{occupancyRate}%</p></div>

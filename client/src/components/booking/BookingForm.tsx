@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import './BookingForm.css';
-import { supabase } from '../../supabaseClient';
+import { api } from '../../lib/api';
 import { BookingPayload, Room, toRoom } from '../../types/supabase';
 import { useAuth } from '../../context/AuthContext';
 import { ensureRoomAvailability } from '../../lib/booking';
@@ -46,23 +46,11 @@ const BookingForm: React.FC = () => {
     if (roomId) {
       const fetchRoom = async () => {
         try {
-          const { data, error: fetchError } = await supabase.from('rooms').select('*').eq('id', roomId).single();
-          if (fetchError) {
-            throw new Error(fetchError.message || 'Failed to load room details');
-          }
+          const data = await api.get('/rooms/' + roomId);
           setRoom(toRoom(data));
         } catch (err) {
           console.error('Error fetching room:', err);
           setError('Failed to load room details');
-        }
-      };
-      fetchRoom();
-    }
-  }, [roomId]);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
       ...prev,
       [name]: value
     }));
@@ -114,21 +102,12 @@ const BookingForm: React.FC = () => {
 
       await ensureRoomAvailability(bookingData.roomId, bookingData.checkIn, bookingData.checkOut);
 
-      const { data: response, error: createError } = await supabase
-        .from('bookings')
-        .insert({
-          user_id: user._id,
-          room_id: bookingData.roomId,
-          check_in: bookingData.checkIn,
-          check_out: bookingData.checkOut,
-          total_price: bookingData.totalPrice,
-        })
-        .select('*')
-        .single();
-
-      if (createError) {
-        throw new Error(createError.message || 'Booking failed. Please try again.');
-      }
+      const response = await api.post('/bookings', {
+        room_id: bookingData.roomId,
+        check_in: bookingData.checkIn,
+        check_out: bookingData.checkOut,
+        total_price: bookingData.totalPrice,
+      });
       
       // Navigate to confirmation page with booking data
       navigate('/booking-confirmation', { 
@@ -172,7 +151,7 @@ const BookingForm: React.FC = () => {
         <div className="room-summary">
           <h3>{room.name}</h3>
           <p>{room.description}</p>
-          <p>Price: ${room.price}/night</p>
+          <p>Price: ₹{room.price}/night</p>
         </div>
       )}
 

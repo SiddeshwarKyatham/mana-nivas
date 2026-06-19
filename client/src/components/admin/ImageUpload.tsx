@@ -1,9 +1,10 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { FaUpload, FaTrash } from 'react-icons/fa';
-import { supabase } from '../../supabaseClient';
 import ConfirmDialog from '../shared/ConfirmDialog';
 import './ImageUpload.css';
+
+import { api } from '../../lib/api';
 
 interface ImageUploadProps {
   roomId: string;
@@ -26,12 +27,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ roomId, currentImages, onImag
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const updateRoomImages = async (images: string[]) => {
-    const { error } = await supabase.from('rooms').update({ images }).eq('id', roomId);
-    if (error) {
-      throw new Error(error.message || 'Failed to update room images');
-    }
+    await api.put(`/rooms/${roomId}`, { images });
     onImagesUpdated(images);
   };
+
 
   const uploadFiles = async (files: File[]) => {
     const imageFiles = files.filter((file) => file.type.startsWith('image/'));
@@ -43,20 +42,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ roomId, currentImages, onImag
       const uploadedUrls: string[] = [];
 
       for (const file of imageFiles) {
-        const ext = file.name.includes('.') ? file.name.split('.').pop() : 'jpg';
-        const uniqueName = `${roomId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-        const storagePath = `${roomId}/${uniqueName}`;
+        const formData = new FormData();
+        formData.append('file', file);
 
-        const { error: uploadError } = await supabase.storage.from('rooms').upload(storagePath, file, {
-          upsert: false,
-        });
-
-        if (uploadError) {
-          throw new Error(uploadError.message || 'Failed to upload image');
-        }
-
-        const { data } = supabase.storage.from('rooms').getPublicUrl(storagePath);
-        uploadedUrls.push(data.publicUrl);
+        const response = await api.post('/rooms/upload', formData);
+        uploadedUrls.push(response.url);
       }
 
       await updateRoomImages([...(currentImages || []), ...uploadedUrls]);
@@ -101,12 +91,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ roomId, currentImages, onImag
 
   const handleDeleteImage = async (imageIndex: number) => {
     try {
-      const imageUrl = currentImages[imageIndex];
-      const path = getFilePathFromPublicUrl(imageUrl);
-      if (path) {
-        await supabase.storage.from('rooms').remove([path]);
-      }
-
       const updated = currentImages.filter((_, index) => index !== imageIndex);
       await updateRoomImages(updated);
       setPendingDeleteIndex(null);

@@ -70,7 +70,7 @@
 }
 
 .contact-hero-headline {
-  font-family: 'Cinzel', serif;
+  font-family: var(--font-display);
   font-size: 4rem;
   margin-bottom: 1rem;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
@@ -171,7 +171,7 @@
 
 .contact-info-card h3 {
   color: var(--charcoal);
-  font-family: 'Cinzel', serif;
+  font-family: var(--font-display);
   font-size: 1.8rem;
   margin-bottom: 1.5rem;
   position: relative;
@@ -278,7 +278,7 @@
 
 .contact-info-card h3 {
   color: var(--charcoal);
-  font-family: 'Cinzel', serif;
+  font-family: var(--font-display);
   font-size: 1.4rem;
   margin-bottom: 0.8rem;
   position: relative;
@@ -304,7 +304,7 @@
 }
 
 .map-wrapper h2 {
-  font-family: 'Cinzel', serif;
+  font-family: var(--font-display);
   color: var(--charcoal);
   font-size: 1.8rem;
   margin-bottom: 1.2rem;
@@ -391,7 +391,7 @@
 }
 
 .contact-form-content h2 {
-  font-family: 'Cinzel', serif;
+  font-family: var(--font-display);
   color: var(--charcoal);
   font-size: 2.8rem;
   margin-bottom: 2rem;

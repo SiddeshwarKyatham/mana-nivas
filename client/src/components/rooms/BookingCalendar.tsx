@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import './BookingCalendar.css';
-import { supabase } from '../../supabaseClient';
+import { api } from '../../lib/api';
 
 interface BookingCalendarProps {
   roomId: string;
@@ -26,15 +26,7 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({ roomId, onDateSelect 
       setError('');
 
       try {
-        const { data, error: fetchError } = await supabase
-          .from('bookings')
-          .select('check_in, check_out')
-          .eq('room_id', roomId)
-          .neq('status', 'cancelled');
-
-        if (fetchError) {
-          throw new Error(fetchError.message || 'Failed to fetch bookings');
-        }
+        const data = await api.get(`/rooms/${roomId}/bookings`);
 
         const mappedBookings: Booking[] = (data || []).map((booking: any) => ({
           checkIn: new Date(booking.check_in),
@@ -49,6 +41,7 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({ roomId, onDateSelect 
         setLoading(false);
       }
     };
+
 
     loadBookings();
   }, [roomId]);

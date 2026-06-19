@@ -5,7 +5,13 @@ import RoomSearch, { SearchFilters } from '../components/rooms/RoomSearch';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
 import ErrorAlert from '../components/shared/ErrorAlert';
 import { supabase } from '../supabaseClient';
+import { Room, toRoom } from '../types/supabase';
+import RoomCard from '../components/rooms/RoomCard';
+import { useAuth } from '../context/AuthContext';
+import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import './rooms.css';
+
+import { api } from '../lib/api';
 
 const DEFAULT_SEARCH_FILTERS: SearchFilters = {
   priceRange: [0, 50000],
@@ -15,17 +21,15 @@ const DEFAULT_SEARCH_FILTERS: SearchFilters = {
   checkOut: null,
 };
 
-interface Room {
-  _id: string;
-  name: string;
-  type: string;
-  description: string;
-  price: number;
-  amenities: string[];
-  images: string[];
-}
+
 
 const Rooms = () => {
+  // Integrate dynamic high-prestige SEO metadata tags
+  useDocumentMetadata(
+    'Our Premium Rooms & Suites',
+    'Browse and book our luxury suites, heritage rooms, family rooms, and deluxe accommodations at Mana Nivas.'
+  );
+
   const [searchParams, setSearchParams] = useSearchParams();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [advancedFilters, setAdvancedFilters] = useState<SearchFilters>(DEFAULT_SEARCH_FILTERS);
@@ -38,41 +42,29 @@ const Rooms = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const { loading: authLoading } = useAuth();
+
   const fetchRooms = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const { data, error: supabaseError } = await supabase
-        .from('rooms')
-        .select('*');
-
-      if (supabaseError) {
-        throw new Error(supabaseError.message || 'Failed to fetch rooms');
-      }
-
-      const normalizedRooms: Room[] = (data || []).map((room: any) => ({
-        _id: String(room.id ?? room._id),
-        name: room.name || '',
-        type: room.type || '',
-        description: room.description || '',
-        price: Number(room.price ?? 0),
-        amenities: Array.isArray(room.amenities) ? room.amenities : [],
-        images: Array.isArray(room.images) ? room.images : [],
-      }));
-
+      const data = await api.get('/rooms');
+      const normalizedRooms: Room[] = (data || []).map((room: any) => toRoom(room));
       setRooms(normalizedRooms);
+      setLoading(false);
     } catch (err: any) {
       setError(err?.message || 'Failed to fetch rooms');
       setShowError(true);
-    } finally {
       setLoading(false);
     }
   };
 
+
   useEffect(() => {
+    if (authLoading) return;
     fetchRooms();
-  }, []);
+  }, [authLoading]);
 
   useEffect(() => {
     const query = (searchParams.get('q') || '').trim();
@@ -145,17 +137,7 @@ const Rooms = () => {
     ? `Showing ${filteredRooms.length} of ${rooms.length} rooms`
     : 'No rooms currently available';
 
-  if (loading && retryCount === 0) {
-    return (
-      <div className="rooms-page">
-        <div className="rooms-header">
-          <h1 className="rooms-title">Our Rooms</h1>
-          <p className="rooms-subtitle">Discover our luxurious accommodations designed for your comfort</p>
-        </div>
-        <LoadingSpinner size="large" message="Loading rooms..." />
-      </div>
-    );
-  }
+
 
   if (error && showError) {
     return (
@@ -205,11 +187,7 @@ const Rooms = () => {
           <RoomSearch key={roomSearchKey} onSearch={handleSearch} />
         </motion.div>
 
-        {loading && (
-          <div className="loading-overlay">
-            <LoadingSpinner size="medium" message="Refreshing rooms..." />
-          </div>
-        )}
+
 
         <div className="rooms-meta">
           <p>{resultsSummary}</p>
@@ -234,52 +212,13 @@ const Rooms = () => {
         )}
 
         <div className="rooms-grid">
-          {filteredRooms.length > 0 ? (
+          {loading ? (
+            <div className="loading-container" style={{ minHeight: '300px', gridColumn: '1 / -1' }}>
+              <LoadingSpinner size="large" message="Loading rooms..." />
+            </div>
+          ) : filteredRooms.length > 0 ? (
             filteredRooms.map((room, index) => (
-              <motion.div
-                key={`${room._id}-${filterAnimationTick}`}
-                className="room-card card"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                whileHover={{ y: -5, scale: 1.02 }}
-              >
-                <div className="room-image">
-                  <img 
-                    src={room.images && room.images.length > 0 ? room.images[0] : '/placeholder-room.jpg'}
-                    alt={room.name} 
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = '/placeholder-room.jpg';
-                    }}
-                  />
-                  <div className="room-overlay">
-                    <span className="room-type-badge">{room.type}</span>
-                  </div>
-                </div>
-                <div className="room-info">
-                  <h2 className="room-name">{room.name}</h2>
-                  <div className="room-meta-line">
-                    <span>{room.type}</span>
-                    <span>{room.amenities.length} amenities</span>
-                  </div>
-                  <p className="room-description">{room.description}</p>
-                  <div className="room-amenities">
-                    {room.amenities && room.amenities.slice(0, 3).map((amenity, index) => (
-                      <span key={index} className="amenity">{amenity}</span>
-                    ))}
-                    {room.amenities && room.amenities.length > 3 && (
-                      <span className="amenity more">+{room.amenities.length - 3} more</span>
-                    )}
-                  </div>
-                  <div className="room-price">
-                    <span className="price-label">Starting from</span>
-                    <span className="amount">${room.price.toLocaleString()}</span>
-                    <span className="per-night">per night</span>
-                  </div>
-                  <Link to={`/rooms/${room._id}`} className="btn-primary view-details">View Details</Link>
-                </div>
-              </motion.div>
+              <RoomCard key={`${room.id}-${filterAnimationTick}`} room={room} index={index} />
             ))
           ) : rooms && rooms.length > 0 ? (
             <div className="no-rooms">
