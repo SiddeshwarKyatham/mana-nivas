@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FaCheckCircle, FaHome, FaEnvelope, FaPhone } from 'react-icons/fa';
-import { Room } from '../types/supabase';
+import { Room } from '../types/hotel';
 import './BookingConfirmation.css';
 
 interface BookingConfirmationData {

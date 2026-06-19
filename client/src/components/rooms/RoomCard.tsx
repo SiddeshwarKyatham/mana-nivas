@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Room } from '../../types/supabase';
+import { Room } from '../../types/hotel';
 import StarRating from '../shared/StarRating';
 import './RoomCard.css';
 

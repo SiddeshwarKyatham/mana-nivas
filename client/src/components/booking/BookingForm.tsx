@@ -4,7 +4,7 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import './BookingForm.css';
 import { api } from '../../lib/api';
-import { BookingPayload, Room, toRoom } from '../../types/supabase';
+import { BookingPayload, Room, toRoom } from '../../types/hotel';
 import { useAuth } from '../../context/AuthContext';
 import { ensureRoomAvailability } from '../../lib/booking';
 

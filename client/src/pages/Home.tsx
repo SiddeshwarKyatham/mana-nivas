@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { supabase } from '../supabaseClient';
-import { Room, toRoom } from '../types/supabase';
+import { Room, toRoom } from '../types/hotel';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
 import ErrorAlert from '../components/shared/ErrorAlert';
 import { useAuth } from '../context/AuthContext';
